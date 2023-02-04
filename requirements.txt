@@ -1,0 +1,9 @@
+pyrogram==2.0.97
+tgcrypto==1.2.5
+pyyaml
+requests
+bs4
+lxml
+deepl
+deep-translator==1.9.3
+python-dotenv==0.21.1
