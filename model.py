@@ -7,21 +7,21 @@ class Source:
     channel_id: int
     channel_name: str
     bias: Optional[str]
-    display_name: Optional[str]
-    invite: Optional[str]
-    username: Optional[str]
-    api_id: Optional[int]
-    description: Optional[str]
-    rating: Optional[int]
-    detail_id: Optional[str]
+    display_name: Optional[str] = None
+    invite: Optional[str] = None
+    username: Optional[str] = None
+    api_id: Optional[int] = None
+    description: Optional[str] = None
+    rating: Optional[int] = None
+    detail_id: Optional[int] = None
 
 
 @dataclass
 class SourceDisplay:
     detail_id: int
     display_name: str
-    bias: Optional[str]
-    username: Optional[str]
+    bias: Optional[str] = None
+    username: Optional[str] = None
 
 
 @dataclass
@@ -31,3 +31,15 @@ class Account:
     name: str
     phone_number: str
     description: str
+
+
+@dataclass
+class Post:
+    channel_id: int
+    message_id: int
+    source_channel_id: int
+    source_message_id: int
+    backup_id: int
+    reply_id:Optional[int] = None
+    message_text: Optional[str] = None
+    file_id: Optional[str] = None

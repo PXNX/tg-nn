@@ -33,14 +33,17 @@ create table posts
 (
 
     channel_id bigint not null,
-    source_id      int not null,
-    post_id        int not null,
-    backup_id int not null,
+    message_id   int not null,
+    source_channel_id bigint not null,
+    source_message_id  int not null,
+    backup_id  int not null,
     reply_id int,
-    media_id bigint,
+    message_text text,
+    file_id bigint,
 
-    primary key (channel_id, source_id),
+    primary key (source_channel_id, source_message_id),
+
     CONSTRAINT fk_channel
-      FOREIGN KEY(channel_id)
+      FOREIGN KEY(source_channel_id)
 	  REFERENCES sources(channel_id)
 );

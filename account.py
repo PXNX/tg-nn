@@ -1,4 +1,3 @@
-from config import CHANNEL_TEST
 from model import Account
 
 accounts = [
@@ -19,4 +18,4 @@ accounts = [
     ),
 ]
 
-#get_accounts()
+# get_accounts()

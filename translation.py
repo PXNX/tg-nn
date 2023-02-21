@@ -1,6 +1,6 @@
 import deepl
-from deepl import QuotaExceededException
 from deep_translator import GoogleTranslator
+from deepl import QuotaExceededException
 
 from config import DEEPL
 
