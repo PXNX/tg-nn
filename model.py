@@ -43,3 +43,11 @@ class Post:
     reply_id:Optional[int] = None
     message_text: Optional[str] = None
     file_id: Optional[str] = None
+
+@dataclass
+class CrawlPost:
+    caption: str
+    texts: [str]
+    image_urls: [str]
+    video_urls:[str]
+    url: str

@@ -37,6 +37,7 @@ def get_source_ids_by_api_id(api_id: int) -> [int]:
 
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", res)
 
+            source: Source
             return [source.channel_id for source in res]
     except Exception as e:
         logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", e)
@@ -98,17 +99,11 @@ def get_sources() -> dict[int, SourceDisplay]:
             res = dict()
             s: Source
             for s in sources:
-                if s.display_name is not None:
-                    name = s.display_name
-                else:
-                    name = s.channel_name
-
-                if s.bias is not None:
-                    bias = s.bias
-                else:
-                    bias = ""
-
-                res[s.channel_id] = SourceDisplay(0, name, bias, s.username)
+                res[s.channel_id] = SourceDisplay(0,
+                                                  s.display_name or s.channel_name,
+                                                  s.bias or "",
+                                                  s.username
+                                                  )
 
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RES: ", res)
             return res

@@ -3,11 +3,12 @@ import re
 
 from pyrogram import Client, filters, compose
 from pyrogram.enums import ParseMode
-from pyrogram.types import Message
+from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
 import account
 from config import CHANNEL_BACKUP, CHANNEL_TEST, GROUP_PATTERN
 from constant import HASHTAG, FLAG_EMOJI, PLACEHOLDER, REPLACEMENTS
+from crawl_iiss import try_url
 from data import get_source, get_source_ids_by_api_id, get_patterns, get_post, set_post
 from model import SourceDisplay, Post
 from translation import translate
@@ -48,7 +49,7 @@ async def debloat_text(message: Message, client: Client) -> bool | str:
     else:
         text = message.text.html
 
-    if not any(p in text for p in patterns):
+    if patterns is not None and not any(p in text for p in patterns):
         await message.forward(GROUP_PATTERN)
         await client.send_message(GROUP_PATTERN, text, parse_mode=ParseMode.DISABLED)
         return False
@@ -105,12 +106,12 @@ async def main():
                 return
 
             backup_id = await backup_single(client, message)
-            text = format_text(text, message, source,backup_id)
+            text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
                 reply_id = get_post(message.chat.id, message.reply_to_message_id).message_id
             else:
-                reply_id=None
+                reply_id = None
 
             msg = await client.send_message(703453307, text, disable_web_page_preview=True)
 
@@ -123,8 +124,6 @@ async def main():
                 reply_id,
                 text
             ))
-
-
 
         @app.on_edited_message(filters.text & bf)
         async def edit_text(client: Client, message: Message):
@@ -152,12 +151,12 @@ async def main():
                 return
 
             backup_id = await backup_single(client, message)
-            text = format_text(text, message, source,backup_id)
+            text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
                 reply_id = get_post(message.chat.id, message.reply_to_message_id).message_id
             else:
-                reply_id=None
+                reply_id = None
 
             msg = await message.copy(703453307, caption=text)
 
@@ -188,14 +187,15 @@ async def main():
             mg = await client.get_media_group(message.chat.id, message.id)
 
             backup_id = await backup_multiple(client, mg)
-            text = format_text(text, message, source,backup_id )
+            text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
                 reply_id = get_post(message.chat.id, message.reply_to_message_id).message_id
             else:
-                reply_id=None
+                reply_id = None
 
-            msgs = await client.copy_media_group(703453307, from_chat_id=message.chat.id, message_id=message.id, captions=text)
+            msgs = await client.copy_media_group(703453307, from_chat_id=message.chat.id, message_id=message.id,
+                                                 captions=text)
 
             set_post(Post(
                 703453307,
@@ -222,8 +222,26 @@ async def main():
 
             await client.edit_message_caption(703453307, post.message_id, text)
 
-        apps.append(app)
+        @app.on_message(filters.chat(CHANNEL_TEST) & filters.outgoing)
+        async def test_video(client: Client, message: Message):
+            await client.send_message(CHANNEL_TEST, "getting video...")
 
+            cp = await try_url("https://mil.in.ua/uk/news/cheski-volontery-vidkryly-zbir-na-rszv-rm-70/")
+
+            medias = list()
+            for v in cp.video_urls:
+                medias.append(InputMediaVideo(v))
+            for v in cp.image_urls:
+                medias.append(InputMediaPhoto(v))
+            medias[0].caption = cp.caption
+
+            msg = (await client.send_media_group(CHANNEL_TEST, medias))[0]
+
+            for text in cp.texts:
+                msg = await client.send_message(CHANNEL_TEST, text, reply_to_message_id=msg.id,
+                                                disable_web_page_preview=True)
+
+        apps.append(app)
     await compose(apps)
 
 
