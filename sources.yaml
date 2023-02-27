@@ -28,3 +28,11 @@
 -1001391125365:
   channel_name: 'TEST'
   username: "nn_test_channel"
+-1001011817559:
+  channel_name: Militarniy
+  bloat:
+#    - '@milinua'
+    - 'Близький Схід українською\n<a href="https://t.me/MiddleEastinUkrainian">https://t.me/MiddleEastinUkrainian</a>'
+  username: milinua
+  bias: 🇺🇦
+  api_id: 24020245

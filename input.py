@@ -28,7 +28,7 @@ async def extract_chats():
 
 
 def append_sources():
-    with open("sources.yaml", "rb") as stream:
+    with open("import.yaml", "rb") as stream:
         sources = yaml.safe_load(stream)
         print(sources)
 

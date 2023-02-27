@@ -1,7 +1,9 @@
+import datetime
 import re
 
 import httpx
 from bs4 import BeautifulSoup
+from pyrogram.types import Message
 from pytube import YouTube
 
 from model import CrawlPost
@@ -60,13 +62,15 @@ bloat = {
 }
 
 
-async def try_url(url: str) -> CrawlPost:
+async def try_url(message: Message) -> CrawlPost:
+    url = re.findall(r"https://mil\.in\.ua/.+", message.caption.html)[0]
+
     res = httpx.get(url)
     dom = BeautifulSoup(res.content, "html.parser").body.main.div
     if res.status_code == 200:
         print(f"found: {url}", res)
         print("--------------------")
-        title = dom.find("h1", class_="single-news__title").text
+        title = re.findall(r"^.+", message.caption.html)[0]  ##### dom.find("h1", class_="single-news__title").text
         img = dom.find("img", class_="post-banner__img")
 
         print(title)
@@ -97,7 +101,7 @@ async def try_url(url: str) -> CrawlPost:
         for x in text_split:
 
             if index == 0:
-                limit = 960
+                limit = 600
             else:
                 limit = 4000
 
@@ -120,7 +124,8 @@ async def try_url(url: str) -> CrawlPost:
         image_urls = list()
         for i in images:
             r = httpx.get(i, timeout=20)
-            filename = f"img/{i.split('/')[-1]}"
+            # fix file not found?
+            filename = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{i.split('/')[-1]}"
             with open(filename, 'wb') as f:
                 f.write(r.content)
 
@@ -129,7 +134,7 @@ async def try_url(url: str) -> CrawlPost:
         videos = list()
         containers = article.find_all("div", class_='video-container')
         for v in containers:
-            filename = re.findall(r'https://www.youtube.com/embed/(.*)\?feature=oembed', v.find('iframe')['src'])[
+            filename = re.findall(r'https://www\.youtube\.com/embed/(.*)\?feature=oembed', v.find('iframe')['src'])[
                            0] + ".mp4"
 
             video_path = YouTube(v.find("iframe")["src"]).streams.filter(progressive=True,

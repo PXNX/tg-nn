@@ -143,7 +143,7 @@ def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
     try:
         with conn.cursor() as c:
             c.executemany(f"INSERT INTO sources({col}) VALUES ({row})", s_input)
-            c.executemany(f"INSERT INTO bloats(channel_id,pattern) VALUES (%s, '%s')", b_input)
+            c.executemany(f"INSERT INTO bloats(channel_id,pattern) VALUES (%s, %s)", b_input)
             # sources = c.fetchall()
             conn.commit()
 
