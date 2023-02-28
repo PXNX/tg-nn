@@ -7,6 +7,7 @@ class Source:
     channel_id: int
     channel_name: str
     bias: Optional[str]
+    destination: Optional[str] = None
     display_name: Optional[str] = None
     invite: Optional[str] = None
     username: Optional[str] = None
@@ -22,6 +23,7 @@ class SourceDisplay:
     display_name: str
     bias: Optional[str] = None
     username: Optional[str] = None
+    destination: Optional[str] = None
 
 
 @dataclass
@@ -51,3 +53,9 @@ class CrawlPost:
     image_urls: [str]
     video_urls:[str]
     url: str
+
+@dataclass
+class Destination:
+    name: str
+    channel_id: int
+    group_id: Optional[int]

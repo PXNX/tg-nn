@@ -1,6 +1,15 @@
 drop table posts;
 --ALTER TABLE posts ADD COLUMN  media_id bigint;
 
+create table destinations
+(
+    channel_id bigint not null,
+       name varchar(128) not null,
+   group_id bigint,
+
+    primary key (channel_id)
+);
+
 create table sources
 (
     channel_id bigint not null,
@@ -12,9 +21,12 @@ create table sources
     api_id      int,
     description text,
     rating       int,
+    destination int,
     detail_id      int ,
 
-    primary key (channel_id)
+    primary key (channel_id),
+
+    CONSTRAINT fk_destination FOREIGN KEY(destination) REFERENCES destinations(channel_id)
 );
 
 create table bloats
@@ -24,15 +36,12 @@ create table bloats
 
     primary key (channel_id,pattern),
 
-    CONSTRAINT fk_channel
-      FOREIGN KEY(channel_id)
-	  REFERENCES sources(channel_id)
+    CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES sources(channel_id)
 );
 
 create table posts
 (
-
-    channel_id bigint not null,
+    destination bigint not null,
     message_id   int not null,
     source_channel_id bigint not null,
     source_message_id  int not null,
@@ -40,10 +49,8 @@ create table posts
     reply_id int,
     message_text text,
     file_id bigint,
-
     primary key (source_channel_id, source_message_id),
 
-    CONSTRAINT fk_channel
-      FOREIGN KEY(source_channel_id)
-	  REFERENCES sources(channel_id)
+    CONSTRAINT fk_channel FOREIGN KEY(source_channel_id) REFERENCES sources(channel_id),
+	CONSTRAINT fk_destination FOREIGN KEY(destination) REFERENCES destinations(channel_id)
 );

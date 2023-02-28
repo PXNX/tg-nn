@@ -8,7 +8,7 @@ import psycopg2
 from psycopg2.extras import NamedTupleCursor
 
 from config import DATABASE_URL
-from model import Account, Source, SourceDisplay, Post
+from model import Account, Source, SourceDisplay, Post, Destination
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
 
     try:
         with conn.cursor() as c:
-            c.executemany(f"INSERT INTO sources({col}) VALUES ({row})", s_input)
+            c.executemany(f"INSERT INTO sources({col}) VALUES ({row})  ", s_input)
             c.executemany(f"INSERT INTO bloats(channel_id,pattern) VALUES (%s, %s)", b_input)
             # sources = c.fetchall()
             conn.commit()
@@ -175,6 +175,17 @@ def get_post(channel_id: int, message_id: int) -> Post:
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SOURCE: ", s)
 
             return s
+
+    except Exception as e:
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", e)
+        pass
+
+def set_destination(destination: Destination):
+    try:
+        with conn.cursor() as c:
+            c.execute("""INSERT INTO destinations( channel_id, name, group_id  ) VALUES (%s, '%s',%s)""",
+                      (destination.channel_id, destination.group_id,destination.name))
+            conn.commit()
 
     except Exception as e:
         logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", e)

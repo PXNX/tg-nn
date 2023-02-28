@@ -22,6 +22,11 @@ bloat = {
     'href="https://www.facebook.com/milinua">Facebook</a>\xa0||\xa0<a '
     'href="https://www.youtube.com/c/%D0%9C%D1%96%D0%BB%D1%96%D1%82%D0%B0%D1%80%D0%BD%D0%B8%D0%B9">Youtube</a></p><hr'
     '/>',
+    ' “Мілітарний” працює завдяки постійній підтримці СпільнотиСтавай патроном на\xa0Patreon від $1Будь спонсором на\xa0Youtube від 70 грнНавіть донат в 30 грн (ціна 1 кави) допоможе нам працювати далі:PayPal - [email\xa0protected]Приватбанк 4149 6293 1808 2567monobank 4441 1144 4179 6255ETH 0xeEAEAd0d28ea8e0cdadB2692765365e7F54004a3Будь з “Мілітарним” на всіх платформахTwitter\xa0||\xa0Telegram\xa0||\xa0Facebook\xa0||\xa0Youtube',
+    ' “Мілітарний” працює завдяки постійній підтримці Спільноти',
+    'Twitter\xa0||\xa0Telegram\xa0||\xa0Facebook\xa0||\xa0Youtube',
+    'Навіть донат в 30 грн (ціна 1 кави) допоможе нам працювати далі:', 'Будь з “Мілітарним” на всіх платформах',
+    'Twitter\xa0||\xa0Telegram\xa0||\xa0Facebook\xa0||\xa0Youtube'
     '<hr/><p><strong> “<em>Мілітарний</em>” працює завдяки постійній підтримці Спільноти</strong></p><ul><li>Ставай '
     'патроном на\xa0<a href="https://www.patreon.com/milinua">Patreon</a> від $1</li><li>Будь спонсором на\xa0<a '
     'href="https://www.youtube.com/c/%D0%9C%D1%96%D0%BB%D1%96%D1%82%D0%B0%D1%80%D0%BD%D0%B8%D0%B9/videos">Youtube</a> '
@@ -49,6 +54,7 @@ bloat = {
     'href="https://www.facebook.com/milinua">Facebook</a>\xa0||\xa0<a '
     'href="https://www.youtube.com/c/%D0%9C%D1%96%D0%BB%D1%96%D1%82%D0%B0%D1%80%D0%BD%D0%B8%D0%B9">Youtube</a></p><hr'
     '/>',
+    ' “Мілітарний” працює завдяки постійній підтримці СпільнотиСтавай патроном на\xa0Patreon від $1Будь спонсором на\xa0Youtube від 70 грнНавіть донат в 30 грн (ціна 1 кави) допоможе нам працювати далі:PayPal - [email\xa0protected]Приватбанк 4149 6293 1808 2567monobank 4441 1144 4179 6255ETH 0xeEAEAd0d28ea8e0cdadB2692765365e7F54004a3Будь з “Мілітарним” на всіх платформахTwitter\xa0||\xa0Telegram\xa0||\xa0Facebook\xa0||\xa0Youtube “Мілітарний” працює завдяки постійній підтримці Спільноти\n\nНавіть донат в 30 грн (ціна 1 кави) допоможе нам працювати далі: удь з “Мілітарним” на всіх платформах witter\xa0||\xa0Telegram\xa0||\xa0Facebook\xa0||\xa0Youtube',
     '<strong>Навіть донат в 30 грн (ціна 1 кави) допоможе нам працювати далі:</strong>',
     '<strong>Будь з “Мілітарним” на всіх платформах</strong>',
     '<a href="https://twitter.com/mil_in_ua">Twitter</a>\xa0||\xa0<a href="https://t.me/milinua">Telegram</a>\xa0||\xa0<a href="https://www.facebook.com/milinua">Facebook</a>\xa0||\xa0<a href="https://www.youtube.com/c/%D0%9C%D1%96%D0%BB%D1%96%D1%82%D0%B0%D1%80%D0%BD%D0%B8%D0%B9">Youtube</a>',
@@ -66,21 +72,29 @@ async def try_url(message: Message) -> CrawlPost:
     url = re.findall(r"https://mil\.in\.ua/.+", message.caption.html)[0]
 
     res = httpx.get(url)
-    dom = BeautifulSoup(res.content, "html.parser").body.main.div
+    print("RES ::::::::::::::", res)
+
+    if res.status_code == 301:
+        print(res.headers)
+        res = httpx.get(res.headers["location"])
+
     if res.status_code == 200:
+        dom = BeautifulSoup(res.content, "html.parser").body.main.div
         print(f"found: {url}", res)
         print("--------------------")
-        title = re.findall(r"^.+", message.caption.html)[0]  ##### dom.find("h1", class_="single-news__title").text
-        img = dom.find("img", class_="post-banner__img")
+        title = dom.find("h1", class_="single-news__title").text##re.findall(r"^.+", message.caption.html)[0]  #####
+        img = dom.find("img", class_="post-banner__img") or dom.find("img", class_="blog-banner__img")
 
         print(title)
         article = dom.find("div", class_='single-news__wrapper')
 
         paragraphs = list()
         for p in article.find_all("p"):  # todo: find way to also handle UL
-            content = p.decode_contents()
+            if "“Мілітарний”" in p.text:
+                break
+            content = p.text  # .decode_contents() #wants links
 
-            if content not in bloat:
+            if content not in bloat and content != "":
                 paragraphs.append(content)
         print("paragraphs:", paragraphs)
 
@@ -95,17 +109,20 @@ async def try_url(message: Message) -> CrawlPost:
 
         text_split = text.splitlines()
 
-        texts = {0: f"<b>{title}</b>"}
+        texts = {}   #0: f"<b>{title}</b>"
         index = 0
 
         for x in text_split:
 
             if index == 0:
-                limit = 600
+                limit = 580
             else:
                 limit = 4000
 
-            x = f"{texts[index] if index < len(texts) else ''}\n\n{x}"
+            if len(x) > 45 & len(x) < 20:
+                x = f"{texts[index] if index < len(texts) else ''}\n\n{x}"  # this was original
+            else:
+                x = f"{texts[index] if index < len(texts) else ''} {x[1:]}"
 
             if len(x) < limit:
                 texts[index] = x

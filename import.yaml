@@ -1,7 +1,277 @@
--1001011817559:
-  channel_name: Militarniy
-  bloat:
-    - '@milinua'
-    - 'Близький Схід українською\n<a href="https://t.me/MiddleEastinUkrainian">https://t.me/MiddleEastinUkrainian</a>'
-  username: milinua
-  bias: 🇺🇦
+-1001839268196:
+  name: Ukraine
+  group_id: -1001845172955
+  sources:
+      #Test
+      #   -1001526741474:Source('MNChat'),  # MNChat
+      # -1001839268196:Source('Test'),  # Test
+      # 1317941240:Source('MN-Bot',  # MN-bot
+
+      # Ukrainian
+
+
+      #1452778151:
+      #  channel_name: Krugozor
+      # bloat:
+      #   - <a href="https://t.me/krugozor_news">Кругозор</a>
+      # username: krugozor_news
+    # bias: 🇺🇦
+    -1001619608359:
+      api_id: 23847013
+      channel_name: Tysk
+      bias: 🇺🇦
+      username: 'TyskNIP'
+      #1413275904:
+      #  channel_name: NEXTA
+      # bloat:
+      #    - 'Прислать нам информацию: @nextamail_bot или info.py@nexta.tv\n\nПоддержать работу нашей редакции можно через\nPayPal: https://paypal.me/nexta\nPatreon: https://patreon.com/nexta_tv\nИли другие варианты (криптовалюта): https://nexta.tv/support\n\nНаш YouTube\nhttps://www.youtube.com/nexta_tv\nhttps://www.youtube.com/nexta_live\n\nНаш Twitter (In       - English)\nhttps://twitter.com/nexta_tv\n\nНаш TikTok\nwww.tiktok.com/@nexta_tv\n\nШойгу пошёл против Путина / Ну и новости!\nhttps://youtu.be/6T40_Ll1mMs\n\nФСБ готовит госпереворот / Ну и новости!\nhttps://youtu.be/aIiUeuTxJJs'
+      # bias: 🇺🇦
+      # username: 'nexta_live'
+    -1001011817559:
+      api_id: 23847013
+      channel_name: Militarniy
+      bloat:
+        # - '@milinua'
+        - 'Близький Схід українською\n<a href="https://t.me/MiddleEastinUkrainian">https://t.me/MiddleEastinUkrainian</a>'
+      username: milinua
+      bias: 🇺🇦
+    #1783484530:
+    #  channel_name: 'Pravda_Gerashchenko_en'
+    #  username: 'pravdaGerashchenko_en'
+    #  display: 'Anton Herashchenko'
+    #  bias: 🇺🇦
+    -1001469021333:
+      api_id: 23847013
+      channel_name: DeepState
+      bloat:
+        - '<a href="https://deepstateua.shop/">Магазин</a>🛑<a href="https://deepstateua.com/">Блог</a>🛑<a href="https://deepstatemap.live/">Мапа</a>🛑<a href="http://t.me/newsDeepStatebot">Написати нам</a>🛑<a href="https://help.deepstateua.com/">Звіти</a>🛑<a href="https://t.me/help_deepstateua">ЗСУHelp</a>'
+        - '🕶 Нагадуємо підписатися на наш волонтерський канал @help_deepstateua.\n\n💬У випадку неточностей на карті, ви можете нам повідомити через бот @newsdeepstatebot.'
+      username: DeepStateUA
+      bias: 🇺🇦
+    #1201459971:
+    #  channel_name: Rysnya
+    #  username: rysnya200
+    #  bias: 🇺🇦
+    #1470200990:
+    #  channel_name: Suspilne
+    #  username: suspilnenews
+    #  bias: 🇺🇦
+    -1001393505038:
+      api_id: 23847013
+      channel_name: Karpatska Sich
+      username: karpatska_sich
+      bias: 🇺🇦
+    -1001727181613:
+      api_id: 23847013
+      channel_name: NMFTE
+      username: NMFTE
+      bias: 🇺🇦
+      #1673614390:
+      #  channel_name: Taras Hryhorovych
+      # username: taraspovidomlyae
+    #  bias: 🇺🇦
+    -1001731636769:
+      api_id: 23847013
+      channel_name: Batallion Monaco
+      invite: un4Mel3_naU1ZjZi
+      bloat:
+        - '<a href="https://t.me/+un4Mel3_naU1ZjZi">Батальон «Монако» 💎</a>'
+        - '<a href="https://t.me/monakoadvertising">З питань реклами</a>'
+        - '<a href="https://t.me/+un4Mel3_naU1ZjZi">Батальон «Монако» </a><a href="https://t.me/+un4Mel3_naU1ZjZi">💎</a>'
+        - '<strong>@monakoadvertising</strong>'
+      bias: 🇺🇦
+    -1001149787308:
+      api_id: 23847013
+      channel_name: 'INSIDER KYIV'
+      invite: 'JUhC6-fk7QNlMDRi'
+      display: 'Insider Kyiv'
+      bias: 🇺🇦
+      bloat:
+        - '<a href="https://t.me/+WiYK8gxqWnthZjNi">Інсайдер Київ</a> | <a href="https://t.me/insiderkyivbot">Надіслати новину</a>'
+
+    -1001115690634:
+      api_id: 23847013
+      channel_name: '24 канал – новини | Новини України | Війна в Україні 2022 | Бахмут'
+      display: 'Kanal24'
+      bias: 🇺🇦
+      invite: 'N7Vldq9puSkxOWEy'
+      bloat:
+        - '<a href="https://t.me/+N7Vldq9puSkxOWEy">Підписатись на 24 канал</a>'
+    -1001519483747:
+      api_id: 23847013
+      channel_name: 'NEWS |🔥WAR🔥'
+      invite: 'hcD79awRA08sxN2Rk'
+      display: 'War World'
+      bias: 🇺🇦
+      bloat:
+        - '<b>Follow us >> </b><a href="https://t.me/+cD79awRA08sxN2Rk">NEWS |⚔️WAR🪖</a>'
+        - '<b>Follow us &gt;&gt; </b><a href="https://t.me/+cD79awRA08sxN2Rk">NEWS |⚔️WAR🪖</a>'
+        - '<strong>Follow us >> </strong><a href="https://t.me/+cD79awRA08sxN2Rk">NEWS |⚔️WAR🪖</a>'
+
+      # Russian
+      #1260622817:
+      #  channel_name: Readovka
+      #  bias: 🇷🇺
+      # username: readovkanews
+    1149896996:
+      api_id: 23847013
+      channel_name: Interfax
+      bloat:
+        - '@interfaxonline'
+      bias: 🇷🇺
+      username: interfaxonline
+      #1708761316:
+      # name: Prjamoy Efir
+      # invite: https://t.me/+jQvaOFH1zhAzMzIy
+      # bloat:
+      #   - <a href="https://t.me/+jQvaOFH1zhAzMzIy">Прямой эфир - подписаться</a>
+      # bias: 🇷🇺
+      #1099737840:
+      #  channel_name: Rusvesna
+      #  username: rusvesnasu
+      #  bloat:
+      #   - <a href="<strong>t.me/rusvesnasu</strong>"><strong>t.me/rusvesnasu</strong></a>
+    #    - <a href="t.me/rusvesnasu">t.me/rusvesnasu</a>
+    #    - t.me/rusvesnasu
+    #  bias: 🇷🇺
+    #1498939244:
+    #  channel_name: Voenacher
+    #  username: voenacher
+    #  bias: 🇷🇺
+    1152463236:
+      api_id: 23847013
+      channel_name: Vorposte
+      username: vorposte
+      bloat:
+        - '@vorposte'
+      bias: 🇷🇺
+    1074354585:
+      api_id: 23847013
+      channel_name: Milinfolive
+      username: milinfolive
+      bloat:
+        - '@milinfolive'
+      bias: 🇷🇺
+    1577023152:
+      api_id: 23847013
+      channel_name: Syrenka
+      username: pl_syrenka
+      bloat:
+        - '@pl_syrenka — Польша не заграница'
+      bias: 🇵🇱🇷🇺
+    1558764025:
+      api_id: 23847013
+      channel_name: 'Летит Калибр'
+      display: Fliegende Kalibr
+      invite: 5q81cPjA5eE4ZDQy
+      bloat:
+        - - '<em>👁</em> Смотри 🚀 <a href="https://t.me/+5q81cPjA5eE4ZDQy">Летит_Калибр</a>'
+        - '👁 Смотри 🚀 <a href="https://t.me/+5q81cPjA5eE4ZDQy">Летит_Калибр</a>'
+        - '👁 Смотри 🚀 Л<a href="https://t.me/+5q81cPjA5eE4ZDQy">етит_Калибр</a>'
+        - 'Смотри 🚀 <a href="https://t.me/+5q81cPjA5eE4ZDQy">Летит_Калибр</a>'
+      bias: 🇷🇺
+      #1824081223:
+      # name: Für das Mutterland
+      #  username: MOPOZaRodinu
+      #  bloat:
+      #   - https://t.me/MOPOZaRodinu
+      #  bias: 🇷🇺
+      #1627480627:
+      # name: Cyberspec News
+      # username: CyberspecNews
+      # bias: 🇷🇺
+    1218410161:
+      api_id: 23847013
+      channel_name: Dambiev
+      username: ChDambiev
+      bias: 🇷🇺
+      #1205641526:
+      #  channel_name: Krieg Geschichte Waffen
+      #  username: historywarweaponmain
+      # bloat:
+      #   - Война История Оружие\n<a href="https://t.me/historywarweaponmain">Подписаться на канал</a>
+      # bias: 🇷🇺
+      #1513431778:
+      # name: 'Два майора'
+      #  display: 'Zwei Majors'
+      # username: 'dva_majors'
+      #  bloat:
+      #   - '<a href="https://t.me/dva_majors">Два майора</a>'
+      # bias: 🇷🇺
+
+    #Azeri
+    1261746950:
+      api_id: 23847013
+      channel_name: AAF
+      username: military_az
+      bloat:
+        - 'AАF | Чат24/7 |Сотрудничество'
+        - '<a href="http://t.me/military_az"><strong>AАF</strong></a><strong> | </strong><a href="https://t.me/joinchat/TCl5uh3G0Mhx42Kd"><strong>Чат24/7</strong></a><strong> |</strong><a href="https://t.me/geronimo_aaf"><strong>Сотрудничество</strong>'
+        - '<a href="http://t.me/military_az">AАF</a> | <a href="https://t.me/joinchat/TCl5uh3G0Mhx42Kd">Чат24/7</a> |<a href="https://t.me/geronimo_aaf">Сотрудничество</a>'
+        - '<a href="http://t.me/military_az"> AАF </a> | <a href="https://t.me/joinchat/TCl5uh3G0Mhx42Kd"> Чат24/7 </a> | <a href="https://t.me/AslanAslanoff"> Сотрудничество </a>'
+      bias: 🇦🇿
+
+    1111348665:
+      api_id: 23847013
+      channel_name: Милитарист
+      display: Militarist
+      username: infantmilitario
+      bias: 🇷🇺
+
+      #1251299061:
+      #  channel_name: 'SouthFront: Analysis & Intelligence (Ukraine, Syria, Yemen)'
+      # display: 'SouthFront'
+      #  username: 'southfronteng'
+      #1241559280:
+      #  channel_name: 'bmpd'
+      #  username: 'bmpd_cast'
+      # display: 'BMPD'
+
+    -1001883849128:
+      api_id: 23847013
+      channel_name: 'Suriyakmaps'
+      username: 'Suriyak_maps'
+      bias: 🇷🇺
+
+-1001862316175:
+  name: Afrika
+  group_id: -1001888944217
+
+  sources:
+
+    -1001569413723:
+      channel_name: 'SAMU.ZA'
+      username: 'southafricanminorityunion'
+      api_id: 24020245
+    -1001856125821:
+      channel_name: 'Africa Intel'
+      username: 'africaintel'
+      api_id: 24020245
+    -1001176223343:
+      channel_name: 'South Africa, future of the West 🇿🇦'
+      username: 'ZA_future_of_the_West'
+      api_id: 24020245
+    -1001101806611:
+      channel_name: 'Boris Rozhin'
+      username: "boris_rozhin"
+      bias: 🇷🇺
+      api_id: 23847013
+    -1001058013363:
+      channel_name: 'CensorNet'
+      username: "censor_net"
+      bias: 🇺🇦
+      api_id: 23847013
+    -1001669110938:
+      channel_name: 'United24'
+      username: "United24media"
+      bias: 🇺🇦
+      api_id: 23847013
+
+-1001391125365:
+  name: Test
+
+  sources:
+    -1001391125365:
+      api_id: 23847013
+      channel_name: 'TEST'
+      username: 'nn_test69'

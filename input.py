@@ -2,7 +2,8 @@ import yaml
 from pyrogram import Client
 
 import account
-from data import set_sources
+from data import set_sources, set_destination
+from model import Destination
 
 
 async def extract_chats():
@@ -29,10 +30,12 @@ async def extract_chats():
 
 def append_sources():
     with open("import.yaml", "rb") as stream:
-        sources = yaml.safe_load(stream)
-        print(sources)
+        content = yaml.safe_load(stream)
 
-        set_sources(sources)
+        for k,v in content.items():
+            print(k,v)
+            set_destination(Destination(k, v["name"], v["group_id"] if "group_id" in v else None))
+            set_sources(v["sources"])
 
 
 append_sources()

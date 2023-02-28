@@ -8,7 +8,7 @@ from pyrogram.enums import ParseMode
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
 import account
-from config import CHANNEL_BACKUP, CHANNEL_TEST, GROUP_PATTERN
+from config import CHANNEL_BACKUP, CHANNEL_TEST, GROUP_PATTERN, CHANNEL_UA
 from constant import HASHTAG, FLAG_EMOJI, PLACEHOLDER, REPLACEMENTS
 from crawl_iiss import try_url
 from data import get_source, get_source_ids_by_api_id, get_patterns, get_post, set_post
@@ -142,6 +142,33 @@ async def main():
 
             await client.edit_message_text(703453307, post.message_id, text)
 
+        @app.on_message(filters.caption & filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
+        async def test_video(client: Client, message: Message):
+            backup_id = await backup_single(client, message)
+          #  await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
+
+            CHANNEL = CHANNEL_UA
+
+            cp = await try_url(message)
+
+            source = get_source(message.chat.id)
+
+            medias = list()
+            for v in cp.video_urls:
+                medias.append(InputMediaVideo(v))
+            for v in cp.image_urls:
+                medias.append(InputMediaPhoto(v))
+            medias[0].caption = format_text(translate(cp.caption), message, source, backup_id)
+
+            msg = (await client.send_media_group( CHANNEL, medias))[0]
+
+            for text in cp.texts:
+                text = format_text(translate(text), message, source, backup_id)
+                msg = await client.send_message( CHANNEL, text, reply_to_message_id=msg.id,
+                                                disable_web_page_preview=True)
+
+            for f in cp.image_urls + cp.image_urls:
+                Path(f).unlink(missing_ok=True)
         @app.on_message(filters.caption & mf & bf)
         async def new_single(client: Client, message: Message):
             print(">>>>>> handle_single", message.chat.id, message.caption.html)
@@ -224,31 +251,7 @@ async def main():
 
             await client.edit_message_caption(703453307, post.message_id, text)
 
-        @app.on_message(filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
-        async def test_video(client: Client, message: Message):
-            backup_id = await backup_single(client, message)
-            await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
 
-            cp = await try_url(message)
-
-            source = get_source(message.chat.id)
-
-            medias = list()
-            for v in cp.video_urls:
-                medias.append(InputMediaVideo(v))
-            for v in cp.image_urls:
-                medias.append(InputMediaPhoto(v))
-            medias[0].caption = format_text(translate(cp.caption), message, source, backup_id)
-
-            msg = (await client.send_media_group(CHANNEL_TEST, medias))[0]
-
-            for text in cp.texts:
-                text = format_text(translate(text), message, source, backup_id)
-                msg = await client.send_message(CHANNEL_TEST, text, reply_to_message_id=msg.id,
-                                                disable_web_page_preview=True)
-
-            for f in cp.image_urls + cp.image_urls:
-                Path(f).unlink(missing_ok=True)
 
         apps.append(app)
     await compose(apps)
