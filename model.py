@@ -22,8 +22,9 @@ class SourceDisplay:
     detail_id: int
     display_name: str
     bias: Optional[str] = None
+    invite: Optional[str] = None
     username: Optional[str] = None
-    destination: Optional[str] = None
+    destination: Optional[int] = None
 
 
 @dataclass
@@ -37,22 +38,24 @@ class Account:
 
 @dataclass
 class Post:
-    channel_id: int
+    destination: int
     message_id: int
     source_channel_id: int
     source_message_id: int
     backup_id: int
-    reply_id:Optional[int] = None
+    reply_id: Optional[int] = None
     message_text: Optional[str] = None
     file_id: Optional[str] = None
+
 
 @dataclass
 class CrawlPost:
     caption: str
     texts: [str]
     image_urls: [str]
-    video_urls:[str]
+    video_urls: [str]
     url: str
+
 
 @dataclass
 class Destination:

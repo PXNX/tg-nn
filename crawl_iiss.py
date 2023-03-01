@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import re
 
@@ -5,7 +6,7 @@ import httpx
 from bs4 import BeautifulSoup
 from pyrogram.types import Message
 from pytube import YouTube
-
+from PIL import Image
 from model import CrawlPost
 
 bloat = {
@@ -142,11 +143,22 @@ async def try_url(message: Message) -> CrawlPost:
         for i in images:
             r = httpx.get(i, timeout=20)
             # fix file not found?
-            filename = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{i.split('/')[-1]}"
-            with open(filename, 'wb') as f:
+            file_name= i.split('/')[-1]
+            file_type=i.split(".")[-1]
+            file_path = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{file_name}"
+            with open(file_path, 'wb') as f:
                 f.write(r.content)
 
-            image_urls.append(filename)
+            print(file_path, file_name, file_type)
+
+            if file_type == "webp":
+                im = Image.open(file_path).convert("RGB")
+                file_path = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{file_name.replace('webp','jpg')}"
+                im.save("test.jpg", "jpeg")
+                image_urls.append(file_path)
+            else:
+
+                image_urls.append(file_path)
 
         videos = list()
         containers = article.find_all("div", class_='video-container')
@@ -168,4 +180,4 @@ async def try_url(message: Message) -> CrawlPost:
             url
         )
 
-###asyncio.run(try_url("https://mil.in.ua/uk/news/cheski-volontery-vidkryly-zbir-na-rszv-rm-70/"))
+##asyncio.run(try_url("https://mil.in.ua/uk/news/cheski-volontery-vidkryly-zbir-na-rszv-rm-70/"))

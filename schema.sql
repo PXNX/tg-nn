@@ -1,4 +1,4 @@
-drop table posts;
+--drop table posts;
 --ALTER TABLE posts ADD COLUMN  media_id bigint;
 
 create table destinations
@@ -21,7 +21,7 @@ create table sources
     api_id      int,
     description text,
     rating       int,
-    destination int,
+    destination  bigint,
     detail_id      int ,
 
     primary key (channel_id),

@@ -32,9 +32,14 @@ def append_sources():
     with open("import.yaml", "rb") as stream:
         content = yaml.safe_load(stream)
 
-        for k,v in content.items():
-            print(k,v)
+        for k, v in content.items():
+            print(k, v)
             set_destination(Destination(k, v["name"], v["group_id"] if "group_id" in v else None))
+            for k2, v2 in v["sources"].items():
+                print(k2, v2)
+                v2["destination"] = k
+            print("----------------------")
+            print(v["sources"])
             set_sources(v["sources"])
 
 

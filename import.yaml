@@ -2,19 +2,19 @@
   name: Ukraine
   group_id: -1001845172955
   sources:
-      #Test
-      #   -1001526741474:Source('MNChat'),  # MNChat
-      # -1001839268196:Source('Test'),  # Test
-      # 1317941240:Source('MN-Bot',  # MN-bot
+    #Test
+    #   -1001526741474:Source('MNChat'),  # MNChat
+    # -1001839268196:Source('Test'),  # Test
+    # 1317941240:Source('MN-Bot',  # MN-bot
 
-      # Ukrainian
+    # Ukrainian
 
 
-      #1452778151:
-      #  channel_name: Krugozor
-      # bloat:
-      #   - <a href="https://t.me/krugozor_news">Кругозор</a>
-      # username: krugozor_news
+    #1452778151:
+    #  channel_name: Krugozor
+    # bloat:
+    #   - <a href="https://t.me/krugozor_news">Кругозор</a>
+    # username: krugozor_news
     # bias: 🇺🇦
     -1001619608359:
       api_id: 23847013
@@ -84,7 +84,7 @@
       api_id: 23847013
       channel_name: 'INSIDER KYIV'
       invite: 'JUhC6-fk7QNlMDRi'
-      display: 'Insider Kyiv'
+      display: Insider Kyiv
       bias: 🇺🇦
       bloat:
         - '<a href="https://t.me/+WiYK8gxqWnthZjNi">Інсайдер Київ</a> | <a href="https://t.me/insiderkyivbot">Надіслати новину</a>'
@@ -97,6 +97,7 @@
       invite: 'N7Vldq9puSkxOWEy'
       bloat:
         - '<a href="https://t.me/+N7Vldq9puSkxOWEy">Підписатись на 24 канал</a>'
+        - '<a href="https://t.me/+N7Vldq9puSkxOWEy">Підпишись та поділись</a>'
     -1001519483747:
       api_id: 23847013
       channel_name: 'NEWS |🔥WAR🔥'
@@ -113,11 +114,12 @@
       #  channel_name: Readovka
       #  bias: 🇷🇺
       # username: readovkanews
-    1149896996:
+    -1001149896996:
       api_id: 23847013
-      channel_name: Interfax
-      bloat:
-        - '@interfaxonline'
+      channel_name: Интерфакс
+      display_name: Interfax
+      # bloat:
+      #    - '@interfaxonline'
       bias: 🇷🇺
       username: interfaxonline
       #1708761316:
@@ -138,28 +140,29 @@
     #  channel_name: Voenacher
     #  username: voenacher
     #  bias: 🇷🇺
-    1152463236:
+    -1001152463236:
       api_id: 23847013
-      channel_name: Vorposte
+      channel_name: Форпост
       username: vorposte
-      bloat:
-        - '@vorposte'
+      display_name: Forpost
+      #  bloat:
+      #   - '@vorposte'
       bias: 🇷🇺
-    1074354585:
+    -1001074354585:
       api_id: 23847013
       channel_name: Milinfolive
       username: milinfolive
-      bloat:
-        - '@milinfolive'
+      # bloat:
+      #  - '@milinfolive'
       bias: 🇷🇺
-    1577023152:
+    -1001577023152:
       api_id: 23847013
       channel_name: Syrenka
       username: pl_syrenka
       bloat:
         - '@pl_syrenka — Польша не заграница'
       bias: 🇵🇱🇷🇺
-    1558764025:
+    -1001558764025:
       api_id: 23847013
       channel_name: 'Летит Калибр'
       display: Fliegende Kalibr
@@ -180,7 +183,7 @@
       # name: Cyberspec News
       # username: CyberspecNews
       # bias: 🇷🇺
-    1218410161:
+    -1001218410161:
       api_id: 23847013
       channel_name: Dambiev
       username: ChDambiev
@@ -200,7 +203,7 @@
       # bias: 🇷🇺
 
     #Azeri
-    1261746950:
+    -1001261746950:
       api_id: 23847013
       channel_name: AAF
       username: military_az
@@ -211,7 +214,7 @@
         - '<a href="http://t.me/military_az"> AАF </a> | <a href="https://t.me/joinchat/TCl5uh3G0Mhx42Kd"> Чат24/7 </a> | <a href="https://t.me/AslanAslanoff"> Сотрудничество </a>'
       bias: 🇦🇿
 
-    1111348665:
+    -1001111348665:
       api_id: 23847013
       channel_name: Милитарист
       display: Militarist
