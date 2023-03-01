@@ -1,6 +1,8 @@
 import asyncio
+import logging
 import os
 import re
+from datetime import datetime
 from pathlib import Path
 
 from pyrogram import Client, filters, compose
@@ -15,6 +17,13 @@ from data import get_source, get_source_ids_by_api_id, get_patterns, get_post, s
 from model import SourceDisplay, Post
 from translation import translate
 
+
+LOG_FILENAME = rf"C:\Users\Pentex\PycharmProjects\tg-nn\logs\{datetime.now().strftime('%Y-%m-%d')}\{datetime.now().strftime('%H-%M-%S')}.out"
+os.makedirs(os.path.dirname(LOG_FILENAME), exist_ok=True)
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)s - %(funcName)20s()]: %(message)s ",
+    level=logging.INFO, filename=LOG_FILENAME
+)
 
 async def backup_single(client: Client, message: Message) -> int:
     msg_backup = await client.forward_messages(CHANNEL_BACKUP, message.chat.id, message.id)
@@ -56,8 +65,9 @@ async def debloat_text(message: Message, client: Client) -> bool | str:
         await client.send_message(GROUP_PATTERN, text, parse_mode=ParseMode.DISABLED)
         return False
 
-    for p in patterns:
-        text = re.sub(p, "", text)
+    if patterns is not None:
+        for p in patterns:
+            text = re.sub(p, "", text)
     text = re.sub(r"<(?!\/?a(?=>|\s.*>))\/?.*?>", "", text)
     text = re.sub(f"@{message.chat.username}$", "", text)
     emojis = re.findall(FLAG_EMOJI, text)
@@ -115,10 +125,10 @@ async def main():
             else:
                 reply_id = None
 
-            msg = await client.send_message(703453307, text, disable_web_page_preview=True)
+            msg = await client.send_message(source.destination, text, disable_web_page_preview=True)
 
             set_post(Post(
-                703453307,
+                msg.chat.id,
                 msg.id,
                 message.chat.id,
                 message.id,
@@ -140,7 +150,7 @@ async def main():
 
             text = format_text(text, message, source, post.backup_id)
 
-            await client.edit_message_text(703453307, post.message_id, text)
+            await client.edit_message_text(post.channel_id, post.message_id, text)
 
         @app.on_message(filters.caption & filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
         async def test_video(client: Client, message: Message):
@@ -187,10 +197,10 @@ async def main():
             else:
                 reply_id = None
 
-            msg = await message.copy(703453307, caption=text)
+            msg = await message.copy(source.destination, caption=text)
 
             set_post(Post(
-                703453307,
+                msg.chat.id,
                 msg.id,
                 message.chat.id,
                 message.id,
@@ -223,11 +233,13 @@ async def main():
             else:
                 reply_id = None
 
-            msgs = await client.copy_media_group(703453307, from_chat_id=message.chat.id, message_id=message.id,
+            msgs = await client.copy_media_group(source.destination,
+                                                 from_chat_id=message.chat.id,
+                                                 message_id=message.id,
                                                  captions=text)
 
             set_post(Post(
-                703453307,
+                msgs[0].chat.id,
                 msgs[0].id,
                 message.chat.id,
                 message.id,
@@ -249,7 +261,7 @@ async def main():
 
             text = format_text(text, message, source, post.backup_id)
 
-            await client.edit_message_caption(703453307, post.message_id, text)
+            await client.edit_message_caption(post.channel_id, post.message_id, text)
 
 
 

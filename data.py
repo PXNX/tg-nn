@@ -81,7 +81,7 @@ def get_source(channel_id: int) -> SourceDisplay:
             else:
                 detail = None
 
-            return SourceDisplay(detail, name, bias, s.username)
+            return SourceDisplay(detail, name, bias, s.username,s.destination or 703453307)
 
     except Exception as e:
         logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", e)
@@ -102,7 +102,8 @@ def get_sources() -> dict[int, SourceDisplay]:
                 res[s.channel_id] = SourceDisplay(0,
                                                   s.display_name or s.channel_name,
                                                   s.bias or "",
-                                                  s.username
+                                                  s.username,
+                                                  s.destination
                                                   )
 
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RES: ", res)
@@ -183,8 +184,8 @@ def get_post(channel_id: int, message_id: int) -> Post:
 def set_destination(destination: Destination):
     try:
         with conn.cursor() as c:
-            c.execute("""INSERT INTO destinations( channel_id, name, group_id  ) VALUES (%s, '%s',%s)""",
-                      (destination.channel_id, destination.group_id,destination.name))
+            c.execute("""INSERT INTO destinations( channel_id, name, group_id  ) VALUES (%s, %s,%s)""",
+                      (destination.channel_id,destination.name, destination.group_id))
             conn.commit()
 
     except Exception as e:

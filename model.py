@@ -56,6 +56,6 @@ class CrawlPost:
 
 @dataclass
 class Destination:
-    name: str
     channel_id: int
+    name: str
     group_id: Optional[int]
