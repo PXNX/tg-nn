@@ -15,6 +15,7 @@ class Source:
     description: Optional[str] = None
     rating: Optional[int] = None
     detail_id: Optional[int] = None
+    is_active:bool = False
 
 
 @dataclass

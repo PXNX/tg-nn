@@ -26,7 +26,8 @@ create table sources
 
     primary key (channel_id),
 
-    CONSTRAINT fk_destination FOREIGN KEY(destination) REFERENCES destinations(channel_id)
+    CONSTRAINT fk_destination FOREIGN KEY(destination) REFERENCES destinations(channel_id),
+     CONSTRAINT fk_account FOREIGN KEY(api_id) REFERENCES accounts(api_id)
 );
 
 create table bloats
@@ -53,4 +54,15 @@ create table posts
 
     CONSTRAINT fk_channel FOREIGN KEY(source_channel_id) REFERENCES sources(channel_id),
 	CONSTRAINT fk_destination FOREIGN KEY(destination) REFERENCES destinations(channel_id)
+);
+
+create table accounts
+(
+    api_id bigint not null,
+     api_hash text not null,
+        name varchar(20) not null,
+        phone_number varchar(14) not null,
+        description text,
+
+    primary key (api_id)
 );
