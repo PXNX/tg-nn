@@ -1,7 +1,7 @@
+import account
 import yaml
 from pyrogram import Client
 
-import account
 from data import set_sources, set_destination
 from model import Destination
 

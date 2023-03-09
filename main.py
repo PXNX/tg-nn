@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import re
 from datetime import datetime
 from pathlib import Path
 
@@ -10,31 +9,20 @@ from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
-import account
-from config import CHANNEL_BACKUP, CHANNEL_TEST, GROUP_PATTERN, CHANNEL_UA
-from constant import HASHTAG, PLACEHOLDER, REPLACEMENTS
+from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA
 from crawl_iiss import try_url
-from data import get_source, get_source_ids_by_api_id, get_patterns, get_post, set_post
-from model import SourceDisplay, Post
-from regex import HTML_TAG
-from translation import translate
+from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
+from model import Post
+from translation import translate, debloat_text, format_text
 
-LOG_FILENAME = rf"C:\Users\Pentex\PycharmProjects\tg-nn\logs\{datetime.now().strftime('%Y-%m-%d')}\{datetime.now().strftime('%H-%M-%S')}.out"
+LOG_FILENAME = rf"./logs/{datetime.now().strftime('%Y-%m-%d')}/{datetime.now().strftime('%H-%M-%S')}.out"
 os.makedirs(os.path.dirname(LOG_FILENAME), exist_ok=True)
 logging.basicConfig(
-    format='%(asctime)s [%(levelname)-5s] %(filename)16s:%(lineno)04d %(funcName)-20s# : %(message)s',
+    format='%(asctime)s [%(levelname)-5s] %(filename)16s:%(lineno)04d %(funcName)-20s : %(message)s',
     level=logging.INFO,
     filename=LOG_FILENAME,
     datefmt='%Y-%m-%d:%H:%M:%S'
 )
-
-BLACKLIST = [
-    "Нічний чат, правила стандартні:"
-]
-
-
-def escape(string: str) -> str:
-    return re.escape(string)  # .replace(' ',r'\s+')
 
 
 async def backup_single(client: Client, message: Message) -> int:
@@ -50,133 +38,10 @@ async def backup_multiple(client: Client, messages: [Message]) -> int:
     return msg_backup.id
 
 
-def format_text(text: str, message: Message, source: SourceDisplay, backup_id: int) -> str:
-    name = source.display_name
-    if source.bias is not None:
-        name += f" {source.bias}"
-
-    formatted = f"{text}\n\nQuelle: <a href='{message.link}'>{name}</a> |<a href='https://t.me/nn_backup/{backup_id}'> 💾 </a>"
-    if source.username is None and source.invite is not None:
-        # remove if detail added
-        formatted += f"|<a href='https://t.me/+{source.invite}'> 🔗️ </a>"
-    if source.detail_id is not None:
-        formatted += f"|<a href='https://t.me/nn_sources/{source.detail_id}'> ℹ️ </a>"
-    formatted += "\n\n👉 Folge @NYX_News für mehr!"
-
-    #   print("-------------------------\n>>>>>>>> formatted:\n", formatted)
-    return formatted
-
-
-async def debloat_text(message: Message, client: Client) -> bool | str:
-    patterns = get_patterns(message.chat.id)
-
-    if message.caption is not None:
-        limit = 60
-        text = message.caption.html
-    else:
-        text = message.text.html
-        limit = 150
-
-    if text in BLACKLIST:
-        return False
-
-    if patterns is not None and len(patterns) != 0:
-        pattern = fr"({')|('.join([escape(p) for p in patterns])})"
-
-        result = re.findall(pattern, text, flags=re.IGNORECASE)
-        print("clean_pattern__result", text, result)
-        print(pattern)
-
-        if len(result) == 0:
-            await message.forward(GROUP_PATTERN)
-            await client.send_message(GROUP_PATTERN, text, parse_mode=ParseMode.DISABLED)
-
-            print("doesnt match\n\n--")
-            return False
-
-        text = re.sub(pattern, "", text)
-
-    print("clean_pattern", text)
-
-    text = re.sub(HTML_TAG, "", text).rstrip()
-    print("clean_html", text)
-    text = re.sub(f"@{message.chat.username}$", "", text, flags=re.IGNORECASE).rstrip()
-    print("username <<<<<", text)
-
-    emoji_pattern = re.compile("(["
-                               "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                               u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                               u"\U0001F600-\U0001F64F"  # emoticons
-                               u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                               u"\U0001F700-\U0001F77F"  # alchemical symbols
-                               u"\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-                               u"\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-                               u"\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-                               u"\U0001FA00-\U0001FA6F"  # Chess Symbols
-                               u"\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-                               "\U00002702-\U000027B0"  # Dingbats
-                               r"])([^\s"
-                               "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                               u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                               u"\U0001F600-\U0001F64F"  # emoticons
-                               u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                               u"\U0001F700-\U0001F77F"  # alchemical symbols
-                               u"\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-                               u"\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-                               u"\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-                               u"\U0001FA00-\U0001FA6F"  # Chess Symbols
-                               u"\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-                               "\U00002702-\U000027B0"  # Dingbats
-                               r"]+)", flags=re.UNICODE)
-
-    text = re.sub(emoji_pattern, r"\1 \2", text)
-    print("<<<<< spaced", text)
-
-    flag_pattern = re.compile("["
-                              "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                              u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                              u"\U0001F600-\U0001F64F"  # emoticons
-                              u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                              u"\U0001F700-\U0001F77F"  # alchemical symbols
-                              u"\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-                              u"\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-                              u"\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-                              u"\U0001FA00-\U0001FA6F"  # Chess Symbols
-                              u"\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-                              "\U00002702-\U000027B0"  # Dingbats
-                              r"]"  # |<\/?a[^>]*>
-                              , flags=re.UNICODE)
-
-    emojis = re.findall(flag_pattern, text)
-    text = re.sub(flag_pattern, PLACEHOLDER, re.sub(HASHTAG, "", text, ).rstrip()).rstrip()
-    print("-------------------------\n>>>>>>>> sub_text:\n", text)
-    print(">>>>>>>>>> placeholder", text)
-    rep = dict((re.escape(k), v) for k, v in REPLACEMENTS.items())
-    pattern = re.compile("|".join(rep.keys()))
-    text = pattern.sub(lambda m: rep[re.escape(m.group(0))], text)
-
-    print("<<<<< spaced_BEFORE:::", text)
-
-    if len(text) < limit:
-        print(f"Text too short - limit: {limit}")
-        return False
-
-    translated_text = translate(text)
-
-    print("--------------------------------------------------------\n\n------ TRANS -single", text, emojis)
-
-    for emoji in emojis:
-        translated_text = re.sub(PLACEHOLDER, emoji, translated_text, 1)
-        print("translated_text :::::: ", translated_text)
-
-    print("-------------------------\n>>>>>>>> translated_text:\n", translated_text)
-    return translated_text
-
-
 async def main():
     apps = list()
 
-    for a in account.accounts:
+    for a in get_accounts():
         print(f"Account {a.name} >>>>>")
         logging.info(f"Account {a.name} >>>>>")
         app = Client(

@@ -12,3 +12,4 @@ beautifulsoup4~=4.11.2
 httpx~=0.23.3
 CairoSVG==2.6.0
 pytube==12.1.2
+emoji==2.2.0

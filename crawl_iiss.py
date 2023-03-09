@@ -1,12 +1,12 @@
-import asyncio
 import datetime
 import re
 
 import httpx
+from PIL import Image
 from bs4 import BeautifulSoup
 from pyrogram.types import Message
 from pytube import YouTube
-from PIL import Image
+
 from model import CrawlPost
 
 bloat = {
@@ -83,7 +83,7 @@ async def try_url(message: Message) -> CrawlPost:
         dom = BeautifulSoup(res.content, "html.parser").body.main.div
         print(f"found: {url}", res)
         print("--------------------")
-        title = dom.find("h1", class_="single-news__title").text##re.findall(r"^.+", message.caption.html)[0]  #####
+        title = dom.find("h1", class_="single-news__title").text  ##re.findall(r"^.+", message.caption.html)[0]  #####
         img = dom.find("img", class_="post-banner__img") or dom.find("img", class_="blog-banner__img")
 
         print(title)
@@ -110,7 +110,7 @@ async def try_url(message: Message) -> CrawlPost:
 
         text_split = text.splitlines()
 
-        texts = {}   #0: f"<b>{title}</b>"
+        texts = {}  # 0: f"<b>{title}</b>"
         index = 0
 
         for x in text_split:
@@ -143,8 +143,8 @@ async def try_url(message: Message) -> CrawlPost:
         for i in images:
             r = httpx.get(i, timeout=20)
             # fix file not found?
-            file_name= i.split('/')[-1]
-            file_type=i.split(".")[-1]
+            file_name = i.split('/')[-1]
+            file_type = i.split(".")[-1]
             file_path = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{file_name}"
             with open(file_path, 'wb') as f:
                 f.write(r.content)
@@ -153,7 +153,7 @@ async def try_url(message: Message) -> CrawlPost:
 
             if file_type == "webp":
                 im = Image.open(file_path).convert("RGB")
-                file_path = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{file_name.replace('webp','jpg')}"
+                file_path = f"img/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')}{file_name.replace('webp', 'jpg')}"
                 im.save("test.jpg", "jpeg")
                 image_urls.append(file_path)
             else:

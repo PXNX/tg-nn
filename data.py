@@ -1,7 +1,6 @@
 import inspect
 import logging
 from dataclasses import fields
-from re import Pattern
 from traceback import format_exc
 from typing import Dict, Union
 
@@ -26,7 +25,7 @@ def get_accounts() -> [Account]:
 
             return res
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
 
 
@@ -41,7 +40,7 @@ def get_source_ids_by_api_id(api_id: int) -> [int]:
             source: Source
             return [source.channel_id for source in res]
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
 
 
@@ -55,7 +54,7 @@ def get_patterns(channel_id: int) -> [str]:
 
             return res
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed { repr(e)} - {format_exc()}" )
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -85,12 +84,12 @@ def get_source(channel_id: int) -> SourceDisplay:
             if hasattr(s, 'destination') and s.detail_id is not None:
                 destination = s.destination
             else:
-                destination= None
+                destination = None
 
-            return SourceDisplay( s.detail_id, name, bias,s.invite, s.username,s.destination)
+            return SourceDisplay(s.detail_id, name, bias, s.invite, s.username, s.destination)
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
 
 
@@ -115,7 +114,7 @@ def get_sources() -> dict[int, SourceDisplay]:
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RES: ", res)
             return res
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
 
 
@@ -147,7 +146,7 @@ def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
     for i in range(1, len(field_names)):
         row += ", %s"
 
-    print("--- col:",col)
+    print("--- col:", col)
 
     try:
         with conn.cursor() as c:
@@ -157,7 +156,7 @@ def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
             conn.commit()
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
 
 
@@ -166,12 +165,14 @@ def set_post(post: Post):
         with conn.cursor() as c:
             c.execute("""INSERT INTO posts( destination, message_id, source_channel_id, source_message_id, backup_id, 
              reply_id,  message_text,  file_id ) VALUES (%s, %s,%s,%s,%s,%s,%s,%s);""",
-                      (post.destination, post.message_id, post.source_channel_id, post.source_message_id, post.backup_id,
-                       post.reply_id, post.message_text, post.file_id))
+                      (
+                          post.destination, post.message_id, post.source_channel_id, post.source_message_id,
+                          post.backup_id,
+                          post.reply_id, post.message_text, post.file_id))
             conn.commit()
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
 
 
@@ -179,7 +180,7 @@ def get_post(source_channel_id: int, source_message_id: int) -> Post:
     try:
         with conn.cursor() as c:
             c.execute("select * from posts where source_channel_id = %s and source_message_id = %s;",
-                      ( source_channel_id,source_message_id))
+                      (source_channel_id, source_message_id))
             s: Post = c.fetchone()
 
             print(">>>>>>>>>>>>>>>>>>>>>>>> get_post >>>>>>>>>>>>>>>>> POST: ", s)
@@ -187,16 +188,31 @@ def get_post(source_channel_id: int, source_message_id: int) -> Post:
             return s
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
         pass
+
 
 def set_destination(destination: Destination):
     try:
         with conn.cursor() as c:
             c.execute("""INSERT INTO destinations( channel_id, name, group_id  ) VALUES (%s, %s,%s)""",
-                      (destination.channel_id,destination.name, destination.group_id))
+                      (destination.channel_id, destination.name, destination.group_id))
             conn.commit()
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e),format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        pass
+
+
+def get_accounts() -> [Account]:
+    try:
+        with conn.cursor() as c:
+            c.execute("select * from accounts;")
+            res: [Account] = c.fetchall()
+
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get_accounts: ", res)
+
+            return res
+    except Exception as e:
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
