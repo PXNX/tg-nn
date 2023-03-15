@@ -1,3 +1,5 @@
+import logging
+
 import deepl
 import regex as re
 from deep_translator import GoogleTranslator
@@ -8,7 +10,7 @@ from pyrogram.types import Message
 
 from config import DEEPL, GROUP_PATTERN
 from constant import PLACEHOLDER, REPLACEMENT, PATTERN_REPLACEMENT, PATTERN_HTMLTAG, \
-    PATTERN_HASHTAG, emoji_space_pattern, emoji_pattern
+    PATTERN_HASHTAG, emoji_space_pattern, emoji_pattern, PATTERN_FITZPATRICK
 from data import get_patterns
 from model import SourceDisplay
 
@@ -24,20 +26,20 @@ def escape(string: str) -> str:
 
 
 def translate(text: str) -> str:
-    translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
-    print("TX:::::", translated_text)
-
     try:
 
-        translated_text = translator.translate_text(text, target_lang="de", split_sentences=SplitSentences.ALL,
+        translated_text = translator.translate_text(text,
+                                                    target_lang="de",
+                                                    split_sentences=SplitSentences.ALL,
                                                     tag_handling="html",
-                                                    preserve_formatting=True).text
+                                                    #     preserve_formatting=True
+                                                    ).text
     except QuotaExceededException:
-        print("--- Quota exceeded ---")
+        logging.info("--- Quota exceeded ---")
         translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
         pass
     except Exception as e:
-        print("--- other error translating --- ", e)
+        logging.error(f"--- other error translating --- {e}")
         translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
         pass
 
@@ -57,17 +59,17 @@ def format_text(text: str, message: Message, source: SourceDisplay, backup_id: i
         formatted += f"|<a href='https://t.me/nn_sources/{source.detail_id}'> ℹ️ </a>"
     formatted += "\n\n👉 Folge @NYX_News für mehr!"
 
-    #   print("-------------------------\n>>>>>>>> formatted:\n", formatted)
+    #   logging.info(f"-------------------------\n>>>>>>>> formatted:\n", formatted)
     return formatted
 
 
 async def debloat_message(message: Message, client: Client) -> bool | str:
     if message.caption is not None:
-        limit = 60
+        limit = 40
         text = message.caption.html
     else:
         text = message.text.html
-        limit = 150
+        limit = 100
 
     if text in BLACKLIST:
         return False
@@ -78,20 +80,26 @@ async def debloat_message(message: Message, client: Client) -> bool | str:
         pattern = fr"({')|('.join([escape(p) for p in patterns])})"
 
         result = re.findall(pattern, text, flags=re.IGNORECASE)
-        print("clean_pattern__result", text, result)
-        print(pattern)
+        logging.info(f"clean_pattern__result {text, result}")
+        logging.info(pattern)
 
         if len(result) == 0:
             await message.forward(GROUP_PATTERN)
             await client.send_message(GROUP_PATTERN, text, parse_mode=ParseMode.DISABLED)
 
-            print("doesnt match\n\n--")
-            return False
+            logging.info(f"-- doesnt match\n\n--")
+            return False  # comment out, if you want to send it despite not matching pattern, might bring in ads
 
         text = re.sub(pattern, "", text)
 
+    text = PATTERN_HTMLTAG.sub("", text).rstrip()
+    text = re.sub(f"@{message.chat.username}$", "", text, flags=re.IGNORECASE).rstrip()
+    logging.info(f"<<<<< subbed  {text}")
+    text = PATTERN_HASHTAG.sub("", text, ).rstrip()
+    logging.info(f"<<<<< hashtag :  {text}")
+
     if len(text) < limit:
-        print(f"Text too short - limit: {limit}")
+        logging.info(f"Text too short - limit: {limit}")
         return False
 
     return text
@@ -103,37 +111,32 @@ async def debloat_text(message: Message, client: Client) -> bool | str:
     if not text:
         return False
 
-    print("clean_pattern", text)
-
-    text = re.sub(PATTERN_HTMLTAG, "", text).rstrip()
-    text = re.sub(f"@{message.chat.username}$", "", text, flags=re.IGNORECASE).rstrip()
-    print("<<<<< subbed", text)
-    text = re.sub(PATTERN_HASHTAG, "", text, ).rstrip()
-    print("<<<<< hashtag : ", text)
+    logging.info(f"clean_pattern  {text}")
 
     text = re.sub(emoji_space_pattern, r"\1 \2", text)
-    print("<<<<< spaced", text)
+    logging.info(f"<<<<< spaced  {text}")
 
     #    emoji.get_emoji_list["en"]
     # emoji.replace_emoji('Python is 👍', replace='')
 
     emojis = emoji_pattern.findall(text)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> emoijis:", emojis)
+    logging.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> emoijis: {emojis}")
     text = emoji_pattern.sub(PLACEHOLDER, text).rstrip()
-    print("-------------------------\n>>>>>>>> sub_text:\n", text)
-    print(">>>>>>>>>> placeholder", text)
+    logging.info(f">>>>>>>>>> placeholder  {text}")
 
     text = PATTERN_REPLACEMENT.sub(REPLACEMENT, text)
 
-    print("<<<<< spaced_BEFORE:::", text)
+    logging.info(f"<<<<< spaced_BEFORE::: {text}", )
 
-    translated_text = translate(text)
+    text = translate(text)
 
-    print("--------------------------------------------------------\n\n------ TRANS -single", text, emojis)
+    logging.info(f"--------------------------------------------------------\n\n------ TRANS -single {text, emojis}", )
 
     for emoji in emojis:
-        translated_text = re.sub(PLACEHOLDER, emoji, translated_text, 1)
-        print("translated_text :::::: ", translated_text)
+        text = re.sub(PLACEHOLDER, emoji, text, 1)
 
-    print("-------------------------\n>>>>>>>> translated_text:\n", translated_text)
-    return translated_text
+    logging.info(f"-------------------------\n>>>>>>>> translated_text:\n {text}")
+
+    text = re.sub(PATTERN_FITZPATRICK, "", text, ).rstrip()
+
+    return text

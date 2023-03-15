@@ -1,4 +1,5 @@
 import datetime
+import logging
 import re
 
 import httpx
@@ -73,20 +74,20 @@ async def try_url(message: Message) -> CrawlPost:
     url = re.findall(r"https://mil\.in\.ua/.+", message.caption.html)[0]
 
     res = httpx.get(url)
-    print("RES ::::::::::::::", res)
+    logging.info(f"RES :::::::::::::: {res}", )
 
     if res.status_code == 301:
-        print(res.headers)
+        logging.info(res.headers)
         res = httpx.get(res.headers["location"])
 
     if res.status_code == 200:
         dom = BeautifulSoup(res.content, "html.parser").body.main.div
-        print(f"found: {url}", res)
-        print("--------------------")
+        logging.info(f"found: {url, res}", )
+        logging.info("--------------------")
         title = dom.find("h1", class_="single-news__title").text  ##re.findall(r"^.+", message.caption.html)[0]  #####
         img = dom.find("img", class_="post-banner__img") or dom.find("img", class_="blog-banner__img")
 
-        print(title)
+        logging.info(title)
         article = dom.find("div", class_='single-news__wrapper')
 
         paragraphs = list()
@@ -97,7 +98,7 @@ async def try_url(message: Message) -> CrawlPost:
 
             if content not in bloat and content != "":
                 paragraphs.append(content)
-        print("paragraphs:", paragraphs)
+        logging.info(f"paragraphs: {paragraphs}")
 
         text = "\n".join(paragraphs)
 
@@ -130,14 +131,14 @@ async def try_url(message: Message) -> CrawlPost:
             else:
                 index += 1
 
-        print(texts)
+        logging.info(texts)
 
-        print("---\n\n\n\n---------")
+        logging.info("---\n\n\n\n---------")
 
         images = [img["data-src"]]
         for img in article.find_all("img"):
             images.append(img["src"])
-        print("images:", images)
+        logging.info(f"images: {images}", )
 
         image_urls = list()
         for i in images:
@@ -149,7 +150,7 @@ async def try_url(message: Message) -> CrawlPost:
             with open(file_path, 'wb') as f:
                 f.write(r.content)
 
-            print(file_path, file_name, file_type)
+            logging.info(f"{file_path, file_name, file_type}")
 
             if file_type == "webp":
                 im = Image.open(file_path).convert("RGB")
@@ -170,7 +171,7 @@ async def try_url(message: Message) -> CrawlPost:
                                                                          file_extension='mp4').order_by(
                 'resolution').desc().first().download(output_path="vid", filename=filename)
             videos.append(video_path)
-        print("videos:", videos)
+        logging.info(f"videos: {videos}")
 
         return CrawlPost(
             texts[0],
@@ -180,4 +181,4 @@ async def try_url(message: Message) -> CrawlPost:
             url
         )
 
-##asyncio.run(try_url("https://mil.in.ua/uk/news/cheski-volontery-vidkryly-zbir-na-rszv-rm-70/"))
+# asyncio.run(try_url("https://mil.in.ua/uk/news/cheski-volontery-vidkryly-zbir-na-rszv-rm-70/"))

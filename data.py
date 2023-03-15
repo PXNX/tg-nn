@@ -15,20 +15,6 @@ logger = logging.getLogger(__name__)
 conn = psycopg2.connect(DATABASE_URL, cursor_factory=NamedTupleCursor)
 
 
-def get_accounts() -> [Account]:
-    try:
-        with conn.cursor() as c:
-            c.execute("select * from accounts")
-            res = c.fetchall()
-
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", res)
-
-            return res
-    except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
-        pass
-
-
 def get_source_ids_by_api_id(api_id: int) -> [int]:
     try:
         with conn.cursor() as c:
@@ -40,7 +26,7 @@ def get_source_ids_by_api_id(api_id: int) -> [int]:
             source: Source
             return [source.channel_id for source in res]
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -62,34 +48,23 @@ def get_source(channel_id: int) -> SourceDisplay:
     try:
         with conn.cursor() as c:
             c.execute("select * from sources where channel_id = %s;", [channel_id])
+
             s: Source = c.fetchone()
 
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SOURCE: ", s)
+            print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SOURCE: {s}")
+            sd = SourceDisplay(
+                display_name=s.display_name or s.channel_name,
+                detail_id=s.detail_id,
+                bias=s.bias,
+                invite=s.invite,
+                username=s.username,
+                destination=s.destination)
 
-            if hasattr(s, 'display_name') and s.display_name is not None:
-                name = s.display_name
-            else:
-                name = s.channel_name
-
-            if hasattr(s, 'bias') and s.bias is not None:
-                bias = s.bias
-            else:
-                bias = ""
-
-            if hasattr(s, 'detail_id') and s.detail_id is not None:
-                detail = s.detail_id
-            else:
-                detail = None
-
-            if hasattr(s, 'destination') and s.detail_id is not None:
-                destination = s.destination
-            else:
-                destination = None
-
-            return SourceDisplay(s.detail_id, name, bias, s.invite, s.username, s.destination)
+            print(f"sd >>>>>>>>>> {sd}")
+            return sd
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -114,7 +89,7 @@ def get_sources() -> dict[int, SourceDisplay]:
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RES: ", res)
             return res
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -156,7 +131,7 @@ def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
             conn.commit()
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -172,7 +147,7 @@ def set_post(post: Post):
             conn.commit()
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -188,7 +163,7 @@ def get_post(source_channel_id: int, source_message_id: int) -> Post:
             return s
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 
@@ -200,7 +175,7 @@ def set_destination(destination: Destination):
             conn.commit()
 
     except Exception as e:
-        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed", repr(e), format_exc())
+        logger.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
 

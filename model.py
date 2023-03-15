@@ -20,8 +20,8 @@ class Source:
 
 @dataclass
 class SourceDisplay:
-    detail_id: int
     display_name: str
+    detail_id: Optional[int] = None
     bias: Optional[str] = None
     invite: Optional[str] = None
     username: Optional[str] = None
