@@ -6,7 +6,7 @@ from typing import Optional
 class Source:
     channel_id: int
     channel_name: str
-    bias: Optional[str]
+    bias: str =""
     destination: Optional[str] = None
     display_name: Optional[str] = None
     invite: Optional[str] = None
@@ -21,10 +21,10 @@ class Source:
 @dataclass
 class SourceDisplay:
     display_name: str
-    detail_id: Optional[int] = None
     bias: Optional[str] = None
     invite: Optional[str] = None
     username: Optional[str] = None
+    detail_id: Optional[int] = None
     destination: Optional[int] = None
 
 
@@ -47,6 +47,7 @@ class Post:
     reply_id: Optional[int] = None
     message_text: Optional[str] = None
     file_id: Optional[str] = None
+    footer:Optional[str] = None
 
 
 @dataclass

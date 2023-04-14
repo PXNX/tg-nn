@@ -10,7 +10,8 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
 from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA
-from crawl_iiss import try_url
+from crawlers.militarnyi import get_militarnyi
+from crawlers.postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
 from model import Post
 from translation import translate, debloat_text, format_text
@@ -56,8 +57,63 @@ async def main():
         )
 
         sources = get_source_ids_by_api_id(a.api_id)  # + [CHANNEL_TEST]
-        if -1001011817559 in sources:
-            sources.remove(-1001011817559)  # because Militarnij has its own function
+
+        remove_sources = [CHANNEL_TEST, -1001011817559, -1001123527809]
+
+        for channel_id in remove_sources:
+            while channel_id in sources: sources.remove(channel_id)
+
+        if app.name == "Michael":
+            @app.on_message(filters.caption & filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
+            async def test_video(client: Client, message: Message):
+                backup_id = await backup_single(client, message)
+                #  await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
+
+                CHANNEL = CHANNEL_UA
+
+                cp = await get_militarnyi(message)
+
+                source = get_source(message.chat.id)
+
+                medias = list()
+                for v in cp.video_urls:
+                    medias.append(InputMediaVideo(v))
+                for v in cp.image_urls:
+                    medias.append(InputMediaPhoto(v))
+                medias[0].caption = format_text(translate(cp.caption), message, source, backup_id)
+
+                msg = (await client.send_media_group(CHANNEL, medias))[0]
+
+                for text in cp.texts:
+                    text = format_text(translate(text), message, source, backup_id)
+                    msg = await client.send_message(CHANNEL, text, reply_to_message_id=msg.id,
+                                                    disable_web_page_preview=True)
+
+                for f in cp.image_urls + cp.image_urls:
+                    Path(f).unlink(missing_ok=True)
+
+        if app.name == "Martin":
+            @app.on_message(filters.chat([CHANNEL_TEST, -1001123527809]) & filters.inline_keyboard)
+            async def handle_postillon(client: Client, message: Message):
+                print("postillon", message)
+
+                backup_id = await backup_single(client, message)
+                #  await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
+
+                cp = await get_postillon(message)
+
+                print("postillon")
+
+                source = get_source(message.chat.id)
+
+                msg = await client.send_photo(source.destination,
+                                              cp.image_urls[0],
+                                              format_text(cp.caption, message, source, backup_id)
+                                              )
+
+                await client.send_message(source.destination, format_text(cp.texts[0], message, source, backup_id),
+                                          reply_to_message_id=msg.id,
+                                          disable_web_page_preview=True)
 
         bf = filters.channel & filters.chat(sources) & filters.incoming & ~filters.forwarded
         mf = bf & (filters.photo | filters.video | filters.animation)
@@ -233,34 +289,23 @@ async def main():
             except MessageNotModified:
                 pass
 
-        if app.name == "Michael":
-            @app.on_message(filters.caption & filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
-            async def test_video(client: Client, message: Message):
-                backup_id = await backup_single(client, message)
-                #  await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
+        @app.on_message(filters.command("join"))
+        async def handle_join(client: Client, message: Message):
+            logging.info(f"join by user {message.from_user.id}")
 
-                CHANNEL = CHANNEL_UA
+            try:
+                chat = await client.join_chat(message.text.split(" ")[1])
 
-                cp = await try_url(message)
+                await message.reply_text(f"Tried to join. Result:\n\n{chat}")
+            except Exception as e:
+                await message.reply_text(f"Tried to join. Error:\n\n{e}")
 
-                source = get_source(message.chat.id)
+        @app.on_message(filters.command("leave"))
+        async def handle_join(client: Client, message: Message):
+            logging.info(f"leave by user {message.from_user.id}")
 
-                medias = list()
-                for v in cp.video_urls:
-                    medias.append(InputMediaVideo(v))
-                for v in cp.image_urls:
-                    medias.append(InputMediaPhoto(v))
-                medias[0].caption = format_text(translate(cp.caption), message, source, backup_id)
-
-                msg = (await client.send_media_group(CHANNEL, medias))[0]
-
-                for text in cp.texts:
-                    text = format_text(translate(text), message, source, backup_id)
-                    msg = await client.send_message(CHANNEL, text, reply_to_message_id=msg.id,
-                                                    disable_web_page_preview=True)
-
-                for f in cp.image_urls + cp.image_urls:
-                    Path(f).unlink(missing_ok=True)
+            chat = await client.leave_chat(message.text.split(" ")[1])
+            await message.reply_text(f"Tried to leave. Result:\n\n{chat}")
 
         apps.append(app)
 

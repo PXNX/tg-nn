@@ -70,7 +70,7 @@ bloat = {
 }
 
 
-async def try_url(message: Message) -> CrawlPost:
+async def get_militarnyi(message: Message) -> CrawlPost:
     url = re.findall(r"https://mil\.in\.ua/.+", message.caption.html)[0]
 
     res = httpx.get(url)
@@ -121,7 +121,7 @@ async def try_url(message: Message) -> CrawlPost:
             else:
                 limit = 4000
 
-            if len(x) > 45 & len(x) < 20:
+            if len(x) > 40 & len(x) < 20:
                 x = f"{texts[index] if index < len(texts) else ''}\n\n{x}"  # this was original
             else:
                 x = f"{texts[index] if index < len(texts) else ''} {x[1:]}"
