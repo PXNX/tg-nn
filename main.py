@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from pyrogram import Client, filters, compose
@@ -111,10 +111,6 @@ async def main():
                                               format_text(cp.caption, message, source, backup_id)
                                               )
 
-                await client.send_message(source.destination, format_text(cp.texts[0], message, source, backup_id),
-                                          reply_to_message_id=msg.id,
-                                          disable_web_page_preview=True)
-
         bf = filters.channel & filters.chat(sources) & filters.incoming & ~filters.forwarded
         mf = bf & (filters.photo | filters.video | filters.animation)
 
@@ -158,6 +154,9 @@ async def main():
         @app.on_edited_message(filters.text & bf)
         async def edit_text(client: Client, message: Message):
             logging.info(f">>>>>> edit_text {message.chat.id, message.text.html}", )
+
+            if message.date < (datetime.now() - timedelta(weeks=1)):
+                return
 
             await asyncio.sleep(60)
             post = get_post(message.chat.id, message.id)
@@ -264,6 +263,9 @@ async def main():
         @app.on_edited_message(filters.caption & mf)
         async def edit_caption(client: Client, message: Message):
             logging.info(f">>>>>> edit_caption {message.chat.id, message.caption.html}", )
+
+            if message.date < (datetime.now() - timedelta(weeks=1)):
+                return
 
             await asyncio.sleep(60)
             post = get_post(message.chat.id, message.id)

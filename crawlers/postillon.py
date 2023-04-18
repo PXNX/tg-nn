@@ -41,20 +41,14 @@ async def get_postillon(message: Message) -> CrawlPost:
 
         # todo: rewrite this to append title to every text
         for p in paragraphs:
-            if len(p) + len(title) < 900:
+            if len(p) + len(title) < 920:
                 title += f"\n\n{p}"
-                paragraphs.pop(0)
 
-        texts = ""
-        for p in paragraphs:
-            texts += f"\n\n{p}"
-
-        print("title :: ", title)
-        print("texts :: ", texts)
+        title+=f"\n\n<a href='{res.url}'>Mehr lesen...</a>"
 
         return CrawlPost(
             title,
-            [texts],
+            None,
             [message.web_page.photo.file_id],
             None,
             url

@@ -29,8 +29,12 @@ def escape(string: str) -> str:
 # might also be able to handle too long posts for caption.
 # just input a threshold parameter here, then send the rest in a separate message
 def chunk_paragraphs(text: str) -> str:
+
+    if len(text) <= 1200:
+        return text
+
     res = []
-    threshold = 420
+    threshold = 440
     for chunk in re.split(PATTERN_PARAGRAPH, text):
         if res and len(chunk) + len(res[-1]) < threshold:
             res[-1] += f' {chunk}'
