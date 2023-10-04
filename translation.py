@@ -14,7 +14,6 @@ from constant import (PLACEHOLDER, PATTERN_REPLACEMENT, PATTERN_HTMLTAG, PATTERN
 from data import get_patterns, get_footer
 from model import SourceDisplay
 
-
 translator = deepl.Translator(DEEPL)
 
 BLACKLIST = [
@@ -29,8 +28,7 @@ def escape(string: str) -> str:
 # might also be able to handle too long posts for caption.
 # just input a threshold parameter here, then send the rest in a separate message
 def chunk_paragraphs(text: str) -> str:
-
-    if len(text) <= 1200:
+    if len(text) <= 1200 and len(re.findall(f'\n\n', text)) < 5:
         return text
 
     res = []
@@ -40,7 +38,7 @@ def chunk_paragraphs(text: str) -> str:
             res[-1] += f' {chunk}'
         else:
             res.append(f'{chunk}')
-    return "\n\n".join(res) #fixme: cuts random letters at the end of sentences that are within a paragraph
+    return "\n\n".join(res)  # fixme: cuts random letters at the end of sentences that are within a paragraph
 
 
 def translate(text: str) -> str:

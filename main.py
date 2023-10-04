@@ -93,7 +93,7 @@ async def main():
                     Path(f).unlink(missing_ok=True)
 
         if app.name == "Martin":
-            @app.on_message(filters.chat([CHANNEL_TEST, -1001123527809]) & filters.inline_keyboard)
+            @app.on_message(filters.chat([CHANNEL_TEST]) & filters.inline_keyboard) #, -1001123527809
             async def handle_postillon(client: Client, message: Message):
                 print("postillon", message)
 

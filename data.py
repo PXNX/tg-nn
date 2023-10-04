@@ -14,18 +14,20 @@ from model import Account, Source, SourceDisplay, Post, Destination
 
 conn = psycopg2.connect(DATABASE_URL, cursor_factory=NamedTupleCursor)
 
+
 def print_psycopg2_exception(err):
     err_type, err_obj, traceback = sys.exc_info()
 
     # get the line number when exception occured
- #   line_num = traceback.tb_lineno
+    #   line_num = traceback.tb_lineno
 
-  #  print ("\npsycopg2 ERROR:", err, "on line number:", line_num)
-#    print ("psycopg2 traceback:", traceback, "-- type:", err_type)
+    #  print ("\npsycopg2 ERROR:", err, "on line number:", line_num)
+    #    print ("psycopg2 traceback:", traceback, "-- type:", err_type)
 
     # psycopg2 extensions.Diagnostics object attribute
     logging.error(f"extensions.Diagnostics: {err.diag}", )
-    logging.error(f"pgerror: {err.pgerror} -- pgcode: {err.pgcode}"  )
+    logging.error(f"pgerror: {err.pgerror} -- pgcode: {err.pgcode}")
+
 
 def get_source_ids_by_api_id(api_id: int) -> [int]:
     try:
@@ -68,7 +70,7 @@ def get_source(channel_id: int) -> SourceDisplay:
         with conn.cursor() as c:
             c.execute("select * from sources where channel_id = %s;", [channel_id])
 
-            s: Source =c.fetchone()
+            s: Source = c.fetchone()
 
             logging.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SOURCE: {s}")
             sd = SourceDisplay(
@@ -103,13 +105,13 @@ def get_sources() -> dict[int, SourceDisplay]:
             s: Source
             for s in sources:
                 res[s.channel_id] = SourceDisplay(
-                                                  s.display_name or s.channel_name,
-                                                  s.bias,
+                    s.display_name or s.channel_name,
+                    s.bias,
                     s.invite,
-                                                  s.username,
+                    s.username,
                     s.detail_id,
-                                                  s.destination
-                                                  )
+                    s.destination
+                )
 
             logging.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RES: {res}")
             return res
@@ -120,7 +122,8 @@ def get_sources() -> dict[int, SourceDisplay]:
         logging.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
 
-def get_footer(channel_id:int)->str|None:
+
+def get_footer(channel_id: int) -> str | None:
     try:
         with conn.cursor() as c:
             c.execute("select footer from destinations where channel_id = %s;", [channel_id])
@@ -136,6 +139,7 @@ def get_footer(channel_id:int)->str|None:
     except Exception as e:
         logging.error(f"{inspect.currentframe().f_code.co_name} — DB-Operation failed {repr(e)} - {format_exc()}")
         pass
+
 
 def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
     field_names = [field.name for field in fields(Source)]
@@ -184,7 +188,7 @@ def set_sources(sources: Dict[int, Dict[str, Union[str, int]]]):
 
 def set_post(post: Post):
     try:
-        #fixme: ON DUPLICATE KEY UPDATE might be better here. still, this function should not be called in the first place!
+        # fixme: ON DUPLICATE KEY UPDATE might be better here. still, this function should not be called in the first place!
         with conn.cursor() as c:
             c.execute("""INSERT INTO posts(destination,message_id,source_channel_id,source_message_id,backup_id, 
              reply_id,message_text,file_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);""",
