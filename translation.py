@@ -2,7 +2,7 @@ import logging
 
 import deepl
 import regex as re
-from deep_translator import GoogleTranslator
+from deep_translator import GoogleTranslator, single_detection
 from deepl import QuotaExceededException, SplitSentences
 from pyrogram import Client
 from pyrogram.enums import ParseMode
@@ -16,9 +16,13 @@ from model import SourceDisplay
 
 translator = deepl.Translator(DEEPL)
 
-BLACKLIST = [
-    "Нічний чат, правила стандартні:"
+_bl_entries = [
+    "Нічний чат, правила стандартні:",
+    "paypal",
+    "patreon"
 ]
+
+BLACKLIST = re.compile(f"({')|('.join(_bl_entries)})", re.IGNORECASE)
 
 
 def escape(string: str) -> str:
@@ -50,6 +54,11 @@ def translate(text: str) -> str:
                                                     tag_handling="html",
                                                     #     preserve_formatting=True
                                                     ).text
+
+        detected_lang = single_detection(translated_text)
+        print(detected_lang)
+        if detected_lang != "de":
+            translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
     except QuotaExceededException:
         logging.info("--- Quota exceeded ---")
         translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
@@ -95,7 +104,7 @@ async def debloat_message(message: Message, client: Client) -> bool | str:
         text = message.text.html
         limit = 100
 
-    if text in BLACKLIST:
+    if len(re.findall(BLACKLIST, text)) != 0:
         return False
 
     patterns = get_patterns(message.chat.id)
