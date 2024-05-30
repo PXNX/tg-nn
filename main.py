@@ -26,6 +26,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+TESTING = False
+
 
 async def backup_single(client: Client, message: Message) -> int:
     msg_backup = await client.forward_messages(CHANNEL_BACKUP, message.chat.id, message.id)
@@ -58,12 +60,13 @@ async def main():
 
         sources = get_source_ids_by_api_id(a.api_id)  # + [CHANNEL_TEST]
 
-        remove_sources = [CHANNEL_TEST, -1001011817559, -1001123527809]
+        if not TESTING:
+            remove_sources = [CHANNEL_TEST, -1001011817559, -1001123527809]
 
-        for channel_id in remove_sources:
-            while channel_id in sources: sources.remove(channel_id)
+            for channel_id in remove_sources:
+                while channel_id in sources: sources.remove(channel_id)
 
-        if app.name == "Michael":
+        if TESTING and app.name == "Michael":
             @app.on_message(filters.caption & filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
             async def test_video(client: Client, message: Message):
                 backup_id = await backup_single(client, message)
@@ -92,7 +95,7 @@ async def main():
                 for f in cp.image_urls + cp.image_urls:
                     Path(f).unlink(missing_ok=True)
 
-        if app.name == "Martin":
+        if TESTING and app.name == "Martin":
             @app.on_message(filters.chat([CHANNEL_TEST]) & filters.inline_keyboard) #, -1001123527809
             async def handle_postillon(client: Client, message: Message):
                 print("postillon", message)
@@ -116,7 +119,7 @@ async def main():
 
         @app.on_message(filters.text & bf)
         async def new_text(client: Client, message: Message):
-            logging.info(f">>>>>> handle_text {message.chat.id, message.text.html}", )
+            logging.info(f">>>>>> {app.name}: handle_text {message.chat.id, message.text.html}", )
 
             source = get_source(message.chat.id)
 
@@ -153,7 +156,7 @@ async def main():
 
         @app.on_edited_message(filters.text & bf)
         async def edit_text(client: Client, message: Message):
-            logging.info(f">>>>>> edit_text {message.chat.id, message.text.html}", )
+            logging.info(f">>>>>> {app.name}: edit_text {message.chat.id, message.text.html ,}", )
 
             if message.date < (datetime.now() - timedelta(weeks=1)):
                 return
@@ -181,7 +184,7 @@ async def main():
 
         @app.on_message(filters.media_group & filters.caption & mf)
         async def new_multiple(client: Client, message: Message):
-            logging.info(f">>>>>> handle_multiple {message.chat.id, message.caption.html}", )
+            logging.info(f">>>>>> {app.name}: handle_multiple {message.chat.id, message.caption.html}", )
 
             source = get_source(message.chat.id)
 
@@ -220,7 +223,7 @@ async def main():
 
         @app.on_message(filters.caption & mf)
         async def new_single(client: Client, message: Message):
-            logging.info(f">>>>>> handle_single {message.chat.id}")
+            logging.info(f">>>>>> {app.name}: handle_single {message.chat.id}")
 
             source = get_source(message.chat.id)
 
@@ -229,7 +232,7 @@ async def main():
                 return
 
             backup_id = await backup_single(client, message)
-            logging.info(f">>>>>> handle_single {source, message.chat.id, backup_id}")
+            logging.info(f">>>>>> {app.name}: handle_single2 {source, message.chat.id, backup_id}")
             text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
@@ -257,12 +260,9 @@ async def main():
 
             logging.info(f"----------------------------------------------------")
 
-        #   logging.info(f">>>>>>>>>>>>>>>>>>>>> file_id ::::::::::::", message.photo.file_id)
-        #  logging.info(f">>>>>>>>>>>>>>>>>>>>> file_unique_id ::::::::::::", message.photo.file_unique_id)
-
         @app.on_edited_message(filters.caption & mf)
         async def edit_caption(client: Client, message: Message):
-            logging.info(f">>>>>> edit_caption {message.chat.id, message.caption.html}", )
+            logging.info(f">>>>>> {app.name}: edit_caption {message.chat.id, message.caption.html}", )
 
             if message.date < (datetime.now() - timedelta(weeks=1)):
                 return
@@ -293,7 +293,7 @@ async def main():
 
         @app.on_message(filters.command("join"))
         async def handle_join(client: Client, message: Message):
-            logging.info(f"join by user {message.from_user.id}")
+            logging.info(f">>> {app.name}: join by user {message.from_user.id}")
 
             try:
                 chat = await client.join_chat(message.text.split(" ")[1])
@@ -304,7 +304,7 @@ async def main():
 
         @app.on_message(filters.command("leave"))
         async def handle_join(client: Client, message: Message):
-            logging.info(f"leave by user {message.from_user.id}")
+            logging.info(f">>> {app.name}: leave by user {message.from_user.id}")
 
             chat = await client.leave_chat(message.text.split(" ")[1])
             await message.reply_text(f"Tried to leave. Result:\n\n{chat}")

@@ -55,10 +55,6 @@ def translate(text: str) -> str:
                                                     #     preserve_formatting=True
                                                     ).text
 
-        detected_lang = single_detection(translated_text)
-        print(detected_lang)
-        if detected_lang != "de":
-            translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
     except QuotaExceededException:
         logging.info("--- Quota exceeded ---")
         translated_text = GoogleTranslator(source='auto', target="de").translate(text=text)
