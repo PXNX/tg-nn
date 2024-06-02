@@ -4,9 +4,9 @@ import deepl
 import regex as re
 from deep_translator import GoogleTranslator, single_detection
 from deepl import QuotaExceededException, SplitSentences
-from pyrogram import Client
-from pyrogram.enums import ParseMode
-from pyrogram.types import Message
+from hydrogram import Client
+from hydrogram.enums import ParseMode
+from hydrogram.types import Message
 
 from config import DEEPL, GROUP_PATTERN
 from constant import (PLACEHOLDER, PATTERN_REPLACEMENT, PATTERN_HTMLTAG, PATTERN_HASHTAG, emoji_space_pattern,

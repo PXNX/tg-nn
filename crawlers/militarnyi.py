@@ -5,7 +5,7 @@ import re
 import httpx
 from PIL import Image
 from bs4 import BeautifulSoup
-from pyrogram.types import Message
+from hydrogram.types import Message
 from pytube import YouTube
 
 from model import CrawlPost
