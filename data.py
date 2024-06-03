@@ -1,7 +1,7 @@
 import inspect
 import logging
 import sys
-from dataclasses import fields, make_dataclass
+from dataclasses import fields
 from traceback import format_exc
 from typing import Dict, Union
 
@@ -18,7 +18,7 @@ conn = connect(DATABASE_URL, cursor_factory=NamedTupleCursor)
 def print_psycopg2_exception(err):
     err_type, err_obj, traceback = sys.exc_info()
 
-    # get the line number when exception occured
+    # get the line number when exception occurred
     #   line_num = traceback.tb_lineno
 
     #  print ("\npsycopg2 ERROR:", err, "on line number:", line_num)

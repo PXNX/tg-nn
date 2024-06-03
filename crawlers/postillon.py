@@ -1,5 +1,4 @@
 import logging
-import re
 
 import httpx
 from bs4 import BeautifulSoup
@@ -44,7 +43,7 @@ async def get_postillon(message: Message) -> CrawlPost:
             if len(p) + len(title) < 920:
                 title += f"\n\n{p}"
 
-        title+=f"\n\n<a href='{res.url}'>Mehr lesen...</a>"
+        title += f"\n\n<a href='{res.url}'>Mehr lesen...</a>"
 
         return CrawlPost(
             title,

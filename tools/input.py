@@ -1,14 +1,13 @@
-import account
 import yaml
 from pyrogram import Client
 
-from data import set_sources, set_destination
+from data import set_sources, set_destination, get_accounts
 from model import Destination
 
 
 async def extract_chats():
     # todo:shit
-    for a in account.accounts:
+    for a in get_accounts():
         print(f"Account {a.name} >>>>>")
         app = Client(
             name=a.name,

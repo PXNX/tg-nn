@@ -9,7 +9,7 @@ from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageNotModified, SessionPasswordNeeded, PasswordHashInvalid, PhoneCodeInvalid
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
-from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA
+from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING
 from crawlers.militarnyi import get_militarnyi
 from crawlers.postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
@@ -18,7 +18,6 @@ from translation import translate, debloat_text, format_text
 
 
 def setup_logging():
-    LOG_FILENAME = rf"./logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
     os.makedirs(os.path.dirname(LOG_FILENAME), exist_ok=True)
     logging.basicConfig(
         format="%(asctime)s %(levelname)-5s %(funcName)-20s [%(filename)s:%(lineno)d]: %(message)s",
@@ -29,19 +28,16 @@ def setup_logging():
     )
 
 
-TESTING = False
-
-
 async def backup_single(client: Client, message: Message) -> int:
     msg_backup = await client.forward_messages(CHANNEL_BACKUP, message.chat.id, message.id)
-    #   logging.info(f"Backup single", msg_backup.link)
+    logging.debug(f"Backup single", msg_backup.link)
     return msg_backup.id
 
 
 async def backup_multiple(client: Client, messages: [Message]) -> int:
     msg_ids = [message.id for message in messages]
     msg_backup = (await client.forward_messages(CHANNEL_BACKUP, messages[0].chat.id, msg_ids))[0]
-    #  logging.info(f"Backup multiple", msg_backup.link)
+    logging.debug(f"Backup multiple", msg_backup.link)
     return msg_backup.id
 
 
@@ -65,11 +61,10 @@ async def main():
             parse_mode=ParseMode.HTML
         )
 
-
-        sources = get_source_ids_by_api_id(a.api_id)  # + [CHANNEL_TEST]
+        sources = get_source_ids_by_api_id(a.api_id)
 
         if not TESTING:
-            remove_sources = [-1001011817559, -1001123527809] #CHANNEL_TEST,
+            remove_sources = [CHANNEL_TEST, -1001011817559, -1001123527809]
 
             for channel_id in remove_sources:
                 while channel_id in sources:
@@ -79,9 +74,7 @@ async def main():
             @app.on_message(filters.caption & filters.chat([CHANNEL_TEST, -1001011817559]) & filters.photo)
             async def test_video(client: Client, message: Message):
                 backup_id = await backup_single(client, message)
-                #  await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
-
-                CHANNEL = CHANNEL_UA
+                # await client.send_message(CHANNEL_TEST, "Artikel lädt [der Download von Videos/Bildern dauert etwas]")
 
                 cp = await get_militarnyi(message)
 
@@ -94,11 +87,11 @@ async def main():
                     medias.append(InputMediaPhoto(v))
                 medias[0].caption = format_text(translate(cp.caption), message, source, backup_id)
 
-                msg = (await client.send_media_group(CHANNEL, medias))[0]
+                msg = (await client.send_media_group(CHANNEL_UA, medias))[0]
 
                 for text in cp.texts:
                     text = format_text(translate(text), message, source, backup_id)
-                    msg = await client.send_message(CHANNEL, text, reply_to_message_id=msg.id,
+                    msg = await client.send_message(CHANNEL_UA, text, reply_to_message_id=msg.id,
                                                     disable_web_page_preview=True)
 
                 for f in cp.image_urls + cp.image_urls:
@@ -123,7 +116,7 @@ async def main():
                                               format_text(cp.caption, message, source, backup_id)
                                               )
 
-        bf = filters.channel & filters.chat(sources) & ~filters.forwarded #& filters.incoming
+        bf = filters.channel & filters.chat(sources) & ~filters.forwarded & filters.incoming
         mf = bf & (filters.photo | filters.video | filters.animation)
 
         @app.on_message(filters.text & bf)

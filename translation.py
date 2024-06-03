@@ -2,7 +2,7 @@ import logging
 
 import deepl
 import regex as re
-from deep_translator import GoogleTranslator, single_detection
+from deep_translator import GoogleTranslator
 from deepl import QuotaExceededException, SplitSentences
 from pyrogram import Client
 from pyrogram.enums import ParseMode

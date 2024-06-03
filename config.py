@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -13,3 +14,6 @@ CHANNEL_UA = -1001839268196
 
 DEEPL = os.getenv("DEEPL")
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+TESTING = False
+LOG_FILENAME = rf"./logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
