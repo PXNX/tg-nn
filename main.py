@@ -4,10 +4,10 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from hydrogram import Client, filters, compose
-from hydrogram.enums import ParseMode
-from hydrogram.errors import MessageNotModified
-from hydrogram.types import Message, InputMediaVideo, InputMediaPhoto
+from pyrogram import Client, filters, compose
+from pyrogram.enums import ParseMode
+from pyrogram.errors import MessageNotModified, SessionPasswordNeeded, PasswordHashInvalid, PhoneCodeInvalid
+from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
 from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA
 from crawlers.militarnyi import get_militarnyi
@@ -53,16 +53,18 @@ async def main():
     for a in get_accounts():
         print(f"Account {a.name} >>>>>")
         logging.info(f"Account {a.name} >>>>>")
+
         app = Client(
             name=a.name,
             api_id=a.api_id,
             api_hash=a.api_hash,
             phone_number=a.phone_number,
-            #   phone_code=input(f"phone code {a.name}:"),
+
             password="area",
             lang_code="de" if a.name == "Michael" else "en",
             parse_mode=ParseMode.HTML
         )
+
 
         sources = get_source_ids_by_api_id(a.api_id)  # + [CHANNEL_TEST]
 
@@ -121,7 +123,7 @@ async def main():
                                               format_text(cp.caption, message, source, backup_id)
                                               )
 
-        bf = filters.channel & filters.chat(sources) #& filters.incoming & ~filters.forwarded
+        bf = filters.channel & filters.chat(sources) & ~filters.forwarded #& filters.incoming
         mf = bf & (filters.photo | filters.video | filters.animation)
 
         @app.on_message(filters.text & bf)

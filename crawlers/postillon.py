@@ -3,7 +3,7 @@ import re
 
 import httpx
 from bs4 import BeautifulSoup
-from hydrogram.types import Message
+from pyrogram.types import Message
 
 from model import CrawlPost
 

@@ -4,9 +4,9 @@ import deepl
 import regex as re
 from deep_translator import GoogleTranslator, single_detection
 from deepl import QuotaExceededException, SplitSentences
-from hydrogram import Client
-from hydrogram.enums import ParseMode
-from hydrogram.types import Message
+from pyrogram import Client
+from pyrogram.enums import ParseMode
+from pyrogram.types import Message
 
 from config import DEEPL, GROUP_PATTERN
 from constant import (PLACEHOLDER, PATTERN_REPLACEMENT, PATTERN_HTMLTAG, PATTERN_HASHTAG, emoji_space_pattern,
@@ -94,11 +94,11 @@ def format_text(text: str, message: Message, source: SourceDisplay, backup_id: i
 
 async def debloat_message(message: Message, client: Client) -> bool | str:
     if message.caption is not None:
-        limit = 40
+        limit = 20
         text = message.caption.html
     else:
         text = message.text.html
-        limit = 100
+        limit = 30
 
     if len(re.findall(BLACKLIST, text)) != 0:
         return False

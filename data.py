@@ -5,14 +5,14 @@ from dataclasses import fields, make_dataclass
 from traceback import format_exc
 from typing import Dict, Union
 
-import psycopg2
-from psycopg2 import OperationalError
+
+from psycopg2 import OperationalError, connect
 from psycopg2.extras import NamedTupleCursor
 
 from config import DATABASE_URL
 from model import Account, Source, SourceDisplay, Post, Destination
 
-conn = psycopg2.connect(DATABASE_URL, cursor_factory=NamedTupleCursor)
+conn = connect(DATABASE_URL, cursor_factory=NamedTupleCursor)
 
 
 def print_psycopg2_exception(err):
