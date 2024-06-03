@@ -6,10 +6,10 @@ from pathlib import Path
 
 from pyrogram import Client, filters, compose
 from pyrogram.enums import ParseMode
-from pyrogram.errors import MessageNotModified, SessionPasswordNeeded, PasswordHashInvalid, PhoneCodeInvalid
+from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
-from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING
+from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD
 from crawlers.militarnyi import get_militarnyi
 from crawlers.postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
@@ -30,14 +30,14 @@ def setup_logging():
 
 async def backup_single(client: Client, message: Message) -> int:
     msg_backup = await client.forward_messages(CHANNEL_BACKUP, message.chat.id, message.id)
-    logging.debug(f"Backup single", msg_backup.link)
+    logging.debug(f"Backup singl: {msg_backup.link}", )
     return msg_backup.id
 
 
 async def backup_multiple(client: Client, messages: [Message]) -> int:
     msg_ids = [message.id for message in messages]
     msg_backup = (await client.forward_messages(CHANNEL_BACKUP, messages[0].chat.id, msg_ids))[0]
-    logging.debug(f"Backup multiple", msg_backup.link)
+    logging.debug(f"Backup multiple: {msg_backup.link}", )
     return msg_backup.id
 
 
@@ -55,9 +55,8 @@ async def main():
             api_id=a.api_id,
             api_hash=a.api_hash,
             phone_number=a.phone_number,
-
-            password="area",
-            lang_code="de" if a.name == "Michael" else "en",
+            password=PASSWORD,
+            lang_code="de",
             parse_mode=ParseMode.HTML
         )
 
@@ -99,7 +98,7 @@ async def main():
 
         if TESTING and a.name == "Martin":
             @app.on_message(filters.chat([CHANNEL_TEST]) & filters.inline_keyboard)  # , -1001123527809
-            async def handle_postillon(client: Client, message: Message):
+            async def handle_postillion(client: Client, message: Message):
                 print("postillon", message)
 
                 backup_id = await backup_single(client, message)
@@ -261,9 +260,6 @@ async def main():
             ))
 
             logging.info(f"----------------------------------------------------")
-
-        #   logging.info(f">>>>>>>>>>>>>>>>>>>>> {client.name}: file_id ::::::::::::", message.photo.file_id)
-        #  logging.info(f">>>>>>>>>>>>>>>>>>>>> {client.name}: file_unique_id ::::::::::::", message.photo.file_unique_id)
 
         @app.on_edited_message(filters.caption & mf)
         async def edit_caption(client: Client, message: Message):

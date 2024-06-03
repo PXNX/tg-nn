@@ -16,13 +16,13 @@ from model import SourceDisplay
 
 translator = deepl.Translator(DEEPL)
 
-_bl_entries = [
+BLACKLIST = [
     "Нічний чат, правила стандартні:",
     "paypal",
     "patreon"
 ]
 
-BLACKLIST = re.compile(f"({')|('.join(_bl_entries)})", re.IGNORECASE)
+BLACKLIST = re.compile(f"({')|('.join(BLACKLIST)})", re.IGNORECASE)
 
 
 def escape(string: str) -> str:
