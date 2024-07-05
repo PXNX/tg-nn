@@ -22,6 +22,8 @@ CREATE TABLE sources
      rating       INT,
      destination  BIGINT,
      detail_id    INT,
+     is_spread boolean  default true,
+     is_active boolean  default false,
      PRIMARY KEY (channel_id),
      CONSTRAINT fk_destination FOREIGN KEY(destination) REFERENCES destinations(
      channel_id),

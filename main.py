@@ -194,8 +194,10 @@ async def main():
                 return
 
             mg = await client.get_media_group(message.chat.id, message.id)
-
             backup_id = await backup_multiple(client, mg)
+            if not source.is_spread:
+                return
+
             text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
@@ -233,6 +235,9 @@ async def main():
                 return
 
             backup_id = await backup_single(client, message)
+            if not source.is_spread:
+                return
+
             logging.info(f">>>>>> {client.name}: handle_single {source, message.chat.id, backup_id}")
             text = format_text(text, message, source, backup_id)
 
