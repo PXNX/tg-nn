@@ -1,4 +1,4 @@
-pyrogram @ git+https://github.com/KurimuzonAkuma/pyrogram@a177af3
+pyrogram @ githttps://github.com/KurimuzonAkuma/pyrogram/archive/v2.1.25.zip
 # pip install git+https://github.com/KurimuzonAkuma/pyrogram@a177af3 --force-reinstall
 mtprotocrypt==1.2.6.5b0
 pyyaml==6.0.1

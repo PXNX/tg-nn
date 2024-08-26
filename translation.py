@@ -24,6 +24,10 @@ BLACKLIST = [
 
 BLACKLIST = re.compile(f"({')|('.join(BLACKLIST)})", re.IGNORECASE)
 
+ABBREVIATIONS = {
+    "AFU": "ukrainian Armed forces"
+}
+
 
 def escape(string: str) -> str:
     return re.escape(string)  # .replace(' ',r'\s+')
@@ -165,6 +169,10 @@ async def debloat_text(message: Message, client: Client) -> bool | str:
     text = PATTERN_REPLACEMENT.sub(lambda m: REPLACEMENTS[re.escape(m.group(0))], text)
 
     logging.info(f"<<<<< spaced_BEFORE::: {text}", )
+
+    for abbreviation, meaning in ABBREVIATIONS.items():
+        # Use word boundaries to ensure full word matching
+        text = re.sub(r'\b' + re.escape(abbreviation) + r'\b', meaning, text, flags=re.IGNORECASE)
 
     text = translate(text)
 
