@@ -9,7 +9,7 @@ from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
 
-from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD
+from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD, GROUP_LOG
 from crawlers.militarnyi import get_militarnyi
 from crawlers.postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
@@ -299,14 +299,25 @@ async def main():
 
         @app.on_message(filters.command("join"))
         async def handle_join(client: Client, message: Message):
-            logging.info(f"join by user {message.from_user.id}")
+
+            args = message.text.split(" ")[1:]
+            joined_chat = args[0]
+            joined_by = args[1]
+            logging.info(f"join to {joined_chat} by user {joined_by} via {message.from_user.id}")
+
+            if len(args) < 2:
+                await message.reply_text(f"/join {joined_chat} {joined_by} ARGS_DONT_MATCH")
+                await client.send_message(GROUP_LOG, topic=489, text=f"ARGS_DONT_MATCH {joined_chat} {joined_by}\n\n{message.text}")
+
 
             try:
-                chat = await client.join_chat(message.text.split(" ")[1])
+                chat = await client.join_chat()
 
-                await message.reply_text(f"Tried to join. Result:\n\n{chat}")
+                await message.reply_text(f"/join {joined_chat} {joined_by} JOIN_SUCCESS")
+                await client.send_message(GROUP_LOG, topic=489, text=f"Joined {joined_chat} {joined_by}\n\n{chat}")
             except Exception as e:
-                await message.reply_text(f"Tried to join. Error:\n\n{e}")
+                await message.reply_text(f"/join {joined_chat} {joined_by} JOIN_FAILED")
+                await client.send_message(GROUP_LOG, topic=489, text=f"ERROR Joining {joined_chat} {joined_by}\n\n{e}")
 
         @app.on_message(filters.command("leave"))
         async def handle_leave(client: Client, message: Message):
