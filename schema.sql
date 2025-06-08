@@ -60,6 +60,7 @@ CREATE TABLE accounts
   (
      api_id       BIGINT NOT NULL,
      api_hash     TEXT NOT NULL,
+     user_id BIGINT NOT NULL,
      name         VARCHAR(20) NOT NULL,
      phone_number VARCHAR(14) NOT NULL,
      description  TEXT,

@@ -3,11 +3,12 @@ import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import List
 
 from pyrogram import Client, filters, compose
 from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageNotModified
-from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto
+from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto, LinkPreviewOptions
 
 from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD, GROUP_LOG
 from crawlers.militarnyi import get_militarnyi
@@ -34,7 +35,7 @@ async def backup_single(client: Client, message: Message) -> int:
     return msg_backup.id
 
 
-async def backup_multiple(client: Client, messages: [Message]) -> int:
+async def backup_multiple(client: Client, messages: List[Message]) -> int:
     msg_ids = [message.id for message in messages]
     msg_backup = (await client.forward_messages(CHANNEL_BACKUP, messages[0].chat.id, msg_ids))[0]
     logging.debug(f"Backup multiple: {msg_backup.link}", )
@@ -143,7 +144,7 @@ async def main():
                 reply_id = None
 
             logging.info(f"send New Text {client.name}")
-            msg = await client.send_message(source.destination, text, disable_web_page_preview=True)
+            msg = await client.send_message(source.destination, text, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
             set_post(Post(
                 msg.chat.id,

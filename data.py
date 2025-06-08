@@ -1,7 +1,7 @@
 import logging
 from dataclasses import fields
 from functools import wraps
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 from psycopg2 import OperationalError, connect
 from psycopg2.extras import NamedTupleCursor
@@ -29,17 +29,17 @@ def db_operation(func):
 
 
 @db_operation
-def get_source_ids_by_api_id(c, api_id: int) -> [int]:
+def get_source_ids_by_api_id(c, api_id: int) -> List[int]:
     c.execute("select channel_name,channel_id from sources where api_id = %s and is_active=TRUE;", [api_id])
-    res: [Source] = c.fetchall()
+    res: List[Source] = c.fetchall()
     source: Source
     return [source.channel_id for source in res]
 
 
 @db_operation
-def get_patterns(c, channel_id: int) -> [str]:
+def get_patterns(c, channel_id: int) ->List [str]:
     c.execute("select pattern from bloats where channel_id = %s;", [channel_id])
-    res: [str] = [r[0] for r in c.fetchall()]
+    res: List[str] = [r[0] for r in c.fetchall()]
     return res
 
 
@@ -146,7 +146,7 @@ def set_destination(c, destination: Destination):
 
 
 @db_operation
-def get_accounts(c) -> [Account]:
+def get_accounts(c) -> List[Account]:
     c.execute("select * from accounts;")
-    res: [Account] = c.fetchall()
+    res:List [Account] = c.fetchall()
     return res

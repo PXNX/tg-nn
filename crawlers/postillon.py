@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 import httpx
 from bs4 import BeautifulSoup
@@ -11,7 +12,7 @@ bloat = {
 }
 
 
-async def get_postillon(message: Message) -> CrawlPost:
+async def get_postillon(message: Message) -> Optional[CrawlPost ]:
     url = message.reply_markup.inline_keyboard[0][0].url
 
     res = httpx.get(url)
@@ -21,36 +22,38 @@ async def get_postillon(message: Message) -> CrawlPost:
         logging.info(res.headers)
         res = httpx.get(res.headers["location"])
 
-    if res.status_code == 200:
-        dom = BeautifulSoup(res.content, "html.parser").body.main.div
-        logging.info(f"found: {url, res}", )
-        logging.info("--------------------")
-        title = f"<b>{dom.find('h1', class_='entry-title').text}</b>"
+    if res.status_code != 200:
+        return None
 
-        logging.info(title)
-        article = dom.find("div", class_='post-body entry-content')
+    dom = BeautifulSoup(res.content, "html.parser").body.main.div
+    logging.info(f"found: {url, res}", )
+    logging.info("--------------------")
+    title = f"<b>{dom.find('h1', class_='entry-title').text}</b>"
 
-        paragraphs = list()
-        for p in article.find_all("p"):  # todo: find way to also handle UL
-            content = p.text  # .decode_contents() #wants links
+    logging.info(title)
+    article = dom.find("div", class_='post-body entry-content')
 
-            if content not in bloat and content != "":
-                paragraphs.append(content)
-        logging.info(f"paragraphs: {paragraphs}")
+    paragraphs = list()
+    for p in article.find_all("p"):  # todo: find way to also handle UL
+        content = p.text  # .decode_contents() #wants links
 
-        # todo: rewrite this to append title to every text
-        for p in paragraphs:
-            if len(p) + len(title) < 920:
-                title += f"\n\n{p}"
+        if content not in bloat and content != "":
+            paragraphs.append(content)
+    logging.info(f"paragraphs: {paragraphs}")
 
-        title += f"\n\n<a href='{res.url}'>Mehr lesen...</a>"
+    # todo: rewrite this to append title to every text
+    for p in paragraphs:
+        if len(p) + len(title) < 920:
+            title += f"\n\n{p}"
 
-        return CrawlPost(
-            title,
-            None,
-            [message.web_page.photo.file_id],
-            None,
-            url
-        )
+    title += f"\n\n<a href='{res.url}'>Mehr lesen...</a>"
+
+    return CrawlPost(
+        title,
+        None,
+        [message.web_page.photo.file_id],
+        None,
+        url
+    )
 
 # asyncio.run(try_url("https://mil.in.ua/uk/news/cheski-volontery-vidkryly-zbir-na-rszv-rm-70/"))

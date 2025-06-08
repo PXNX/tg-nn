@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -56,9 +56,9 @@ class Post:
 @dataclass
 class CrawlPost:
     caption: str
-    texts: [str]
-    image_urls: [str]
-    video_urls: [str]
+    texts: List[str]
+    image_urls: List[str]
+    video_urls: List[str]
     url: str
 
 
