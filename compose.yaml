@@ -1,0 +1,31 @@
+services:
+  bot:
+    build: ./
+    container_name: tg-nn
+    restart: unless-stopped
+    env_file:
+      - .env # .env is only read with "compose up"
+    environment:
+      CONTAINER: "true"
+      PYTHONPATH: /
+    #   PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+    volumes:
+      - ./sessions:/sessions
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    container_name: postgres-nn
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: nn
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+volumes:
+  pgdata:
+  sessions:

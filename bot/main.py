@@ -11,8 +11,8 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto, LinkPreviewOptions
 
 from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD, GROUP_LOG
-from crawlers.militarnyi import get_militarnyi
-from crawlers.postillon import get_postillon
+from bot.crawlers.militarnyi import get_militarnyi
+from bot.crawlers.postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
 from model import Post
 from translation import translate, debloat_text, format_text
@@ -42,10 +42,26 @@ async def backup_multiple(client: Client, messages: List[Message]) -> int:
     return msg_backup.id
 
 
+def list_dir_tree(start_path):
+   for root, dirs, files in os.walk(start_path):
+      # Determine indentation level
+      level = root.replace(start_path, '').count(os.sep)
+      indent = ' ' * 4 * level
+      # Print folder name
+      print(f'{indent}{os.path.basename(root)}/')
+      sub_indent = ' ' * 4 * (level + 1)
+      # Print files in the folder
+      for f in files:
+         print(f'{sub_indent}{f}')
+
+
 async def main():
     setup_logging()
 
     apps = list()
+
+    logging.error(list_dir_tree(r"/") )
+ #   logging.error(list_dir_tree(r"../"))
 
     for a in get_accounts():
         print(f"Account {a.name} >>>>>")
@@ -58,7 +74,8 @@ async def main():
             phone_number=a.phone_number,
             password=PASSWORD,
             lang_code="de",
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode.HTML,
+            workdir="/sessions"
         )
 
         sources = get_source_ids_by_api_id(a.api_id)

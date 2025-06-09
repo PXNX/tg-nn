@@ -1,4 +1,4 @@
-from translation import chunk_paragraphs
+from bot.translation import chunk_paragraphs
 
 LOREM = """🇺🇸 Der frühere US-Präsident Clinton bedauert, dass er die Ukraine ermutigt hat, Atomwaffen aufzugeben
 

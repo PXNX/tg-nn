@@ -3,8 +3,8 @@ import logging
 import psycopg2
 from psycopg2.extras import NamedTupleCursor
 
-from config import DATABASE_URL
-from model import Post
+from bot.config import DATABASE_URL
+from bot.model import Post
 
 logger = logging.getLogger(__name__)
 conn = psycopg2.connect(DATABASE_URL, cursor_factory=NamedTupleCursor)

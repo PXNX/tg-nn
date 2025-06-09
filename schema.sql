@@ -5,7 +5,6 @@ CREATE TABLE destinations
      channel_id BIGINT NOT NULL,
      name       VARCHAR(128) NOT NULL,
      group_id   BIGINT,
-     footer     TEXT,
      PRIMARY KEY (channel_id)
   );
 

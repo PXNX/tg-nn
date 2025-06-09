@@ -1,8 +1,8 @@
 import yaml
 from pyrogram import Client
 
-from data import set_sources, set_destination, get_accounts
-from model import Destination
+from bot.data import set_sources, set_destination, get_accounts
+from bot.model import Destination
 
 
 async def extract_chats():
