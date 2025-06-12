@@ -10,9 +10,9 @@ from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto, LinkPreviewOptions
 
-from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD, GROUP_LOG, CONTAINER
-from bot.crawlers.militarnyi import get_militarnyi
-from bot.crawlers.postillon import get_postillon
+from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, TESTING, PASSWORD, GROUP_LOG, CONTAINER
+from militarnyi import get_militarnyi
+from postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
 from model import Post
 from translation import translate, debloat_text, format_text

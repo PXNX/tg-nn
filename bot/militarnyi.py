@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from pyrogram.types import Message
 from pytube import YouTube
 
-from bot.model import CrawlPost
+from model import CrawlPost
 
 bloat = {
     '<hr/><p><strong> “<em>Мілітарний</em>” працює завдяки постійній підтримці Спільноти</strong></p><ul><li>Ставай '

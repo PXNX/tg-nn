@@ -5,7 +5,7 @@ import httpx
 from bs4 import BeautifulSoup
 from pyrogram.types import Message
 
-from bot.model import CrawlPost
+from model import CrawlPost
 
 bloat = {
     'Mehr zum Thema:'
