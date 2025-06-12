@@ -60,9 +60,6 @@ async def main():
 
     apps = list()
 
-    logging.error(list_dir_tree(r"/") )
- #   logging.error(list_dir_tree(r"../"))
-
     for a in get_accounts():
         print(f"Account {a.name} >>>>>")
         logging.info(f"Account {a.name} >>>>>")
@@ -75,7 +72,7 @@ async def main():
             password=PASSWORD,
             lang_code="de",
             parse_mode=ParseMode.HTML,
-            workdir="/sessions"
+     #       workdir="../sessions"
         )
 
         sources = get_source_ids_by_api_id(a.api_id)
