@@ -87,7 +87,7 @@ async def main():
             password=PASSWORD,
             lang_code="de",
             parse_mode=ParseMode.HTML,
-            workdir="./sessions"
+       #     workdir="/sessions"
         )
 
         sources = get_source_ids_by_api_id(a.api_id)

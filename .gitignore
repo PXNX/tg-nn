@@ -166,3 +166,4 @@ cython_debug/
 img
 vid
 logs
+sessions
