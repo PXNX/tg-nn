@@ -3,14 +3,14 @@ import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List
+from typing import List, Final
 
 from pyrogram import Client, filters, compose
 from pyrogram.enums import ParseMode
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto, LinkPreviewOptions
 
-from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD, GROUP_LOG
+from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, LOG_FILENAME, TESTING, PASSWORD, GROUP_LOG, CONTAINER
 from bot.crawlers.militarnyi import get_militarnyi
 from bot.crawlers.postillon import get_postillon
 from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
@@ -18,17 +18,32 @@ from model import Post
 from translation import translate, debloat_text, format_text
 
 
-def setup_logging():
-    os.makedirs(os.path.dirname(LOG_FILENAME), exist_ok=True)
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)-5s %(funcName)-20s [%(filename)s:%(lineno)d]: %(message)s",
-        encoding="utf-8",
-        filename=LOG_FILENAME,
-        level=logging.DEBUG,
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+def add_logging():
+    if CONTAINER:
+        logging.basicConfig(
+            format="%(asctime)s %(levelname)-5s %(funcName)-20s [%(filename)s:%(lineno)d]: %(message)s",
+            encoding="utf-8",
 
+            level=logging.INFO,
+            datefmt='%Y-%m-%d %H:%M:%S',
+            handlers=[
+                logging.StreamHandler(),
+                #     logging.FileHandler('logs/log')
+            ]
+        )
 
+    else:
+        log_filename: Final[str] = rf"../logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
+        os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+        logging.basicConfig(
+            format="%(asctime)s %(levelname)-5s %(funcName)-20s [%(filename)s:%(lineno)d]: %(message)s",
+            encoding="utf-8",
+            filename=log_filename,
+            level=logging.INFO,
+            datefmt='%Y-%m-%d %H:%M:%S',
+        )
+
+    logging.getLogger("httpx").setLevel(logging.WARNING)
 async def backup_single(client: Client, message: Message) -> int:
     msg_backup = await client.forward_messages(CHANNEL_BACKUP, message.chat.id, message.id)
     logging.debug(f"Backup singl: {msg_backup.link}", )
@@ -56,7 +71,7 @@ def list_dir_tree(start_path):
 
 
 async def main():
-    setup_logging()
+    add_logging()
 
     apps = list()
 
@@ -72,7 +87,7 @@ async def main():
             password=PASSWORD,
             lang_code="de",
             parse_mode=ParseMode.HTML,
-     #       workdir="../sessions"
+            workdir="./sessions"
         )
 
         sources = get_source_ids_by_api_id(a.api_id)

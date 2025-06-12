@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import Final
 
 from dotenv import load_dotenv
 
@@ -19,3 +20,7 @@ PASSWORD = os.getenv("PASSWORD")
 
 TESTING = False
 LOG_FILENAME = rf"./logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
+
+CONTAINER: Final[bool] = bool(os.getenv('CONTAINER', False), )
+
+RES_PATH: Final[str] = "./res"
