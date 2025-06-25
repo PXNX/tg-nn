@@ -11,7 +11,7 @@ from pyrogram.types import Message
 from config import DEEPL, GROUP_PATTERN
 from constant import (PLACEHOLDER, PATTERN_REPLACEMENT, PATTERN_HTMLTAG, PATTERN_HASHTAG, emoji_space_pattern,
                       emoji_pattern, PATTERN_FITZPATRICK, REPLACEMENTS, PATTERN_PARAGRAPH)
-from data import get_patterns, get_footer
+from db import get_patterns, get_footer
 from model import SourceDisplay
 
 translator = deepl.Translator(DEEPL)
@@ -107,7 +107,7 @@ async def debloat_message(message: Message, client: Client) -> bool | str:
     if len(re.findall(BLACKLIST, text)) != 0:
         return False
 
-    patterns = get_patterns(message.chat.id)
+    patterns = await get_patterns(message.chat.id)
 
     text = PATTERN_HTMLTAG.sub("", text).rstrip()
 

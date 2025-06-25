@@ -16,6 +16,7 @@ CHANNEL_UA = -1001839268196
 
 DEEPL = os.getenv("DEEPL")
 DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL_TEST: Final[str] = os.getenv("DATABASE_URL_TEST")
 PASSWORD = os.getenv("PASSWORD")
 
 TESTING = False

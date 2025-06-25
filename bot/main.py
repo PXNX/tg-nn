@@ -11,10 +11,10 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message, InputMediaVideo, InputMediaPhoto, LinkPreviewOptions
 
 from config import CHANNEL_BACKUP, CHANNEL_TEST, CHANNEL_UA, TESTING, PASSWORD, GROUP_LOG, CONTAINER
+from db import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
 from militarnyi import get_militarnyi
-from postillon import get_postillon
-from data import get_source, get_source_ids_by_api_id, get_post, set_post, get_accounts
 from model import Post
+from postillon import get_postillon
 from translation import translate, debloat_text, format_text
 
 
@@ -44,6 +44,8 @@ def add_logging():
         )
 
     logging.getLogger("httpx").setLevel(logging.WARNING)
+
+
 async def backup_single(client: Client, message: Message) -> int:
     msg_backup = await client.forward_messages(CHANNEL_BACKUP, message.chat.id, message.id)
     logging.debug(f"Backup singl: {msg_backup.link}", )
@@ -58,16 +60,16 @@ async def backup_multiple(client: Client, messages: List[Message]) -> int:
 
 
 def list_dir_tree(start_path):
-   for root, dirs, files in os.walk(start_path):
-      # Determine indentation level
-      level = root.replace(start_path, '').count(os.sep)
-      indent = ' ' * 4 * level
-      # Print folder name
-      print(f'{indent}{os.path.basename(root)}/')
-      sub_indent = ' ' * 4 * (level + 1)
-      # Print files in the folder
-      for f in files:
-         print(f'{sub_indent}{f}')
+    for root, dirs, files in os.walk(start_path):
+        # Determine indentation level
+        level = root.replace(start_path, '').count(os.sep)
+        indent = ' ' * 4 * level
+        # Print folder name
+        print(f'{indent}{os.path.basename(root)}/')
+        sub_indent = ' ' * 4 * (level + 1)
+        # Print files in the folder
+        for f in files:
+            print(f'{sub_indent}{f}')
 
 
 async def main():
@@ -75,7 +77,7 @@ async def main():
 
     apps = list()
 
-    for a in get_accounts():
+    for a in await get_accounts():
         print(f"Account {a.name} >>>>>")
         logging.info(f"Account {a.name} >>>>>")
 
@@ -87,10 +89,10 @@ async def main():
             password=PASSWORD,
             lang_code="de",
             parse_mode=ParseMode.HTML,
-       #     workdir="/sessions"
+            #     workdir="/sessions"
         )
 
-        sources = get_source_ids_by_api_id(a.api_id)
+        sources = await get_source_ids_by_api_id(a.api_id)
 
         if not TESTING:
             remove_sources = [CHANNEL_TEST, -1001011817559, -1001123527809]
@@ -107,7 +109,7 @@ async def main():
 
                 cp = await get_militarnyi(message)
 
-                source = get_source(message.chat.id)
+                source = await get_source(message.chat.id)
 
                 medias = list()
                 for v in cp.video_urls:
@@ -138,7 +140,7 @@ async def main():
 
                 print("postillon")
 
-                source = get_source(message.chat.id)
+                source = await get_source(message.chat.id)
 
                 msg = await client.send_photo(source.destination,
                                               cp.image_urls[0],
@@ -152,7 +154,7 @@ async def main():
         async def new_text(client: Client, message: Message):
             logging.info(f">>>>>> {client.name}: handle_text {message.chat.id, message.text.html}", )
 
-            source = get_source(message.chat.id)
+            source = await get_source(message.chat.id)
 
             text = await debloat_text(message, client)
             if not text:
@@ -164,7 +166,7 @@ async def main():
             text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
-                reply_post = get_post(message.chat.id, message.reply_to_message_id)
+                reply_post = await get_post(message.chat.id, message.reply_to_message_id)
                 if reply_post is None:
                     reply_id = None
                 else:
@@ -173,9 +175,10 @@ async def main():
                 reply_id = None
 
             logging.info(f"send New Text {client.name}")
-            msg = await client.send_message(source.destination, text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+            msg = await client.send_message(source.destination, text,
+                                            link_preview_options=LinkPreviewOptions(is_disabled=True))
 
-            set_post(Post(
+            await set_post(Post(
                 msg.chat.id,
                 msg.id,
                 message.chat.id,
@@ -193,13 +196,13 @@ async def main():
                 return
 
             await asyncio.sleep(60)
-            post = get_post(message.chat.id, message.id)
+            post = await get_post(message.chat.id, message.id)
 
             if post is None:
                 await new_text(client, message)
                 return
 
-            source = get_source(message.chat.id)
+            source = await get_source(message.chat.id)
 
             text = await debloat_text(message, client)
             if not text:
@@ -217,7 +220,7 @@ async def main():
         async def new_multiple(client: Client, message: Message):
             logging.info(f">>>>>> {client.name}: handle_multiple {message.chat.id, message.caption.html}", )
 
-            source = get_source(message.chat.id)
+            source = await get_source(message.chat.id)
 
             text = await debloat_text(message, client)
             if not text:
@@ -231,7 +234,7 @@ async def main():
             text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
-                reply_post = get_post(message.chat.id, message.reply_to_message_id)
+                reply_post = await get_post(message.chat.id, message.reply_to_message_id)
                 if reply_post is None:
                     reply_id = None
                 else:
@@ -244,7 +247,7 @@ async def main():
                                                  message_id=message.id,
                                                  captions=text)
 
-            set_post(Post(
+            await set_post(Post(
                 msgs[0].chat.id,
                 msgs[0].id,
                 message.chat.id,
@@ -258,7 +261,7 @@ async def main():
         async def new_single(client: Client, message: Message):
             logging.info(f">>>>>> {client.name}: handle_single {message.chat.id}")
 
-            source = get_source(message.chat.id)
+            source = await get_source(message.chat.id)
 
             text = await debloat_text(message, client)
             if not text:
@@ -272,7 +275,7 @@ async def main():
             text = format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
-                reply_post = get_post(message.chat.id, message.reply_to_message_id)
+                reply_post = await  get_post(message.chat.id, message.reply_to_message_id)
                 if reply_post is None:
                     reply_id = None
 
@@ -284,7 +287,7 @@ async def main():
             logging.info(f"---- new single {client.name}----- {source}")
             msg = await message.copy(source.destination, caption=text)  # media caption too long
 
-            set_post(Post(
+            await set_post(Post(
                 msg.chat.id,
                 msg.id,
                 message.chat.id,
@@ -304,7 +307,7 @@ async def main():
                 return
 
             await asyncio.sleep(60)
-            post = get_post(message.chat.id, message.id)
+            post = await get_post(message.chat.id, message.id)
 
             if post is None:
                 if message.media_group_id is None:
@@ -313,7 +316,7 @@ async def main():
                     await new_multiple(client, message)
                 return
 
-            source = get_source(message.chat.id)
+            source = await get_source(message.chat.id)
 
             text = await debloat_text(message, client)
             if not text:
@@ -337,17 +340,19 @@ async def main():
 
             if len(args) < 2:
                 await message.reply_text(f"/join {joined_chat} {joined_by} ARGS_DONT_MATCH")
-                await client.send_message(GROUP_LOG, topic=489, text=f"ARGS_DONT_MATCH {joined_chat} {joined_by}\n\n{message.text}")
-
+                await client.send_message(GROUP_LOG, message_thread_id=489,
+                                          text=f"ARGS_DONT_MATCH {joined_chat} {joined_by}\n\n{message.text}")
 
             try:
-                chat = await client.join_chat()
+                chat = await client.join_chat(joined_chat)
 
                 await message.reply_text(f"/join {joined_chat} {joined_by} JOIN_SUCCESS")
-                await client.send_message(GROUP_LOG, topic=489, text=f"Joined {joined_chat} {joined_by}\n\n{chat}")
+                await client.send_message(GROUP_LOG, message_thread_id=489,
+                                          text=f"Joined {joined_chat} {joined_by}\n\n{chat}")
             except Exception as e:
                 await message.reply_text(f"/join {joined_chat} {joined_by} JOIN_FAILED")
-                await client.send_message(GROUP_LOG, topic=489, text=f"ERROR Joining {joined_chat} {joined_by}\n\n{e}")
+                await client.send_message(GROUP_LOG, message_thread_id=489,
+                                          text=f"ERROR Joining {joined_chat} {joined_by}\n\n{e}")
 
         @app.on_message(filters.command("leave"))
         async def handle_leave(client: Client, message: Message):

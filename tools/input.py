@@ -1,7 +1,7 @@
 import yaml
 from pyrogram import Client
 
-from bot.data import set_sources, set_destination, get_accounts
+from bot.db import set_sources, set_destination, get_accounts
 from bot.model import Destination
 
 
