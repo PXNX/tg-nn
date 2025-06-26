@@ -1,17 +1,18 @@
-deep-translator==1.11.4
-deepl==1.22.0
-python-dotenv==1.1.0
-numpy==2.2.5
-ftfy==6.3.1
-pysbd==0.3.4
-requests==2.32.3
-pillow==11.2.1
-regex==2024.11.6
-asyncpg==0.30.0
-lxml==5.4.0
+kurigram==2.2.6
+#pytgcrypto @ git+https://github.com/TelegramPlayGround/pyrogram-tgcrypto
+#pip install -e git+https://github.com/TelegramPlayGround/pyrogram-tgcrypto.git#egg=pytgcrypto
 
-# social
-python-twitter-v2==0.9.2
+pyyaml==6.0.2
+deepl==1.22.0
+deep-translator==1.11.4
+python-dotenv==1.1.1
+asyncpg==0.30.0
+
+beautifulsoup4==4.13.4
+httpx==0.28.1
+pytube==15.0.0
+Pillow==11.2.1
+regex==2024.11.6
 
 # test
 pytest==8.3.5

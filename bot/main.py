@@ -28,7 +28,7 @@ def add_logging():
             datefmt='%Y-%m-%d %H:%M:%S',
             handlers=[
                 logging.StreamHandler(),
-                #     logging.FileHandler('logs/log')
+                  logging.FileHandler('logs/log')
             ]
         )
 
