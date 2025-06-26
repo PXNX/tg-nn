@@ -69,20 +69,20 @@ def db(func: Callable[..., Awaitable]):
 @db
 async def get_source_ids_by_api_id(api_id: int, conn: Connection) -> List[int]:
     res: List[Record] = await conn.fetch(
-        "select channel_name,channel_id from sources where api_id =  $1 and is_active=TRUE;", [api_id])
+        "select channel_name,channel_id from sources where api_id =  $1 and is_active=TRUE;", api_id)
     return [source["channel_id"] for source in res]
 
 
 @db
 async def get_patterns(channel_id: int, conn: Connection) -> List[str]:
-    s = await conn.fetch("select pattern from bloats where channel_id = $1;", [channel_id])
+    s = await conn.fetch("select pattern from bloats where channel_id = $1;", channel_id)
     res: List[str] = [r[0] for r in s]
     return res
 
 
 @db
 async def get_source(channel_id: int, conn: Connection) -> SourceDisplay:
-    s: Source = await conn.fetchrow("select * from sources where channel_id = $1;", [channel_id])
+    s: Source = await conn.fetchrow("select * from sources where channel_id = $1;", channel_id)
 
     sd = SourceDisplay(
         display_name=s.display_name or s.channel_name,
@@ -99,11 +99,12 @@ async def get_source(channel_id: int, conn: Connection) -> SourceDisplay:
 
 @db
 async def get_sources(conn: Connection) -> dict[int, SourceDisplay]:
-    sources = await conn.fetch("select * from sources", [])
+    sources = await conn.fetch("select * from sources")
     s: Source
     return {
         s.channel_id: SourceDisplay(
             s.display_name or s.channel_name,
+            s.is_spread,
             s.bias,
             s.invite,
             s.username,
@@ -116,7 +117,7 @@ async def get_sources(conn: Connection) -> dict[int, SourceDisplay]:
 
 @db
 async def get_footer(channel_id: int, conn: Connection) -> str | None:
-    s = await conn.fetchval("select footer from destinations where channel_id =  $1;", [channel_id])
+    s = await conn.fetchval("select footer from destinations where channel_id =  $1;", channel_id)
     return s
 
 
@@ -168,7 +169,7 @@ async def set_post(post: Post, conn: Connection):
 @db
 async def get_post(source_channel_id: int, source_message_id: int, conn: Connection) -> Post:
     s: Post = await conn.fetchrow("select * from posts where source_channel_id =  $1 and source_message_id =  $2;",
-                                  [source_channel_id, source_message_id])
+                                  (source_channel_id, source_message_id))
     return s
 
 
