@@ -9,8 +9,8 @@ from typing import Dict, Union, List, Optional, Callable, Awaitable
 
 from asyncpg import Pool, create_pool, Connection
 
-from config import DATABASE_URL
-from model import Account, Source, SourceDisplay, Post, Destination
+from bot.config import DATABASE_URL
+from bot.model import Account, Source, SourceDisplay, Post, Destination
 
 
 def get_ssl():
@@ -61,7 +61,7 @@ def db(func: Callable[..., Awaitable]):
 
 @db
 async def get_source_ids_by_api_id(api_id: int, conn: Connection) -> List[int]:
-    res: List[Source] = await conn.fetchmany(
+    res: List[Source] = await conn.fetch(
         "select channel_name,channel_id from sources where api_id = %s and is_active=TRUE;", [api_id])
     source: Source
     return [source.channel_id for source in res]
@@ -69,7 +69,7 @@ async def get_source_ids_by_api_id(api_id: int, conn: Connection) -> List[int]:
 
 @db
 async def get_patterns(channel_id: int, conn: Connection) -> List[str]:
-    s = await conn.fetchmany("select pattern from bloats where channel_id = %s;", [channel_id])
+    s = await conn.fetch("select pattern from bloats where channel_id = %s;", [channel_id])
     res: List[str] = [r[0] for r in s]
     return res
 
@@ -93,7 +93,7 @@ async def get_source(channel_id: int, conn: Connection) -> SourceDisplay:
 
 @db
 async def get_sources(conn: Connection) -> dict[int, SourceDisplay]:
-    sources = await conn.fetchmany("select * from sources", [])
+    sources = await conn.fetch("select * from sources", [])
     s: Source
     return {
         s.channel_id: SourceDisplay(
@@ -174,5 +174,5 @@ async def set_destination(destination: Destination, conn: Connection):
 
 @db
 async def get_accounts(conn: Connection) -> List[Account]:
-    res: List[Account] = await conn.fetchmany("select * from accounts;", [])
+    res: List[Account] = await conn.fetch("select * from accounts;", )
     return res
