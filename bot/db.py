@@ -5,13 +5,18 @@ from dataclasses import fields
 from functools import wraps
 from os import getenv
 from ssl import create_default_context, Purpose, CERT_NONE
-from typing import Dict, Union, List, Optional, Callable, Awaitable
+from typing import Dict, Union, List, Optional, Callable, Awaitable, Any
 
-from asyncpg import Pool, create_pool, Connection
+from asyncpg import Pool, create_pool, Connection, Record
 
 from bot.config import DATABASE_URL
 from bot.model import Account, Source, SourceDisplay, Post, Destination
 
+def record_to_dataclass(record: Record, dataclass_type) -> Any:
+    """Convert asyncpg Record to dataclass"""
+    field_names = [f.name for f in fields(dataclass_type)]
+    values = {name: record[name] for name in field_names if name in record}
+    return dataclass_type(**values)
 
 def get_ssl():
     ssl_ctx = create_default_context(Purpose.SERVER_AUTH)
@@ -61,10 +66,9 @@ def db(func: Callable[..., Awaitable]):
 
 @db
 async def get_source_ids_by_api_id(api_id: int, conn: Connection) -> List[int]:
-    res: List[Source] = await conn.fetch(
+    res: List[Record] = await conn.fetch(
         "select channel_name,channel_id from sources where api_id = %s and is_active=TRUE;", [api_id])
-    source: Source
-    return [source.channel_id for source in res]
+    return [source["channel_id"] for source in res]
 
 
 @db
@@ -174,5 +178,6 @@ async def set_destination(destination: Destination, conn: Connection):
 
 @db
 async def get_accounts(conn: Connection) -> List[Account]:
-    res: List[Account] = await conn.fetch("select * from accounts;", )
-    return res
+    records: List[Record] = await conn.fetch("select * from accounts;", )
+    accs = [record_to_dataclass(r, Account) for r in records]
+    return accs
