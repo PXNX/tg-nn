@@ -145,23 +145,23 @@ async def set_sources(sources: Dict[int, Dict[str, Union[str, int]]], conn: Conn
 async def set_post(post: Post, conn: Connection):
     await conn.execute("""INSERT INTO posts(destination,message_id,source_channel_id,source_message_id,backup_id, 
              reply_id,message_text,file_id) VALUES ($1, $2, $3,$4, $5, $6,$7, $8 );""",
-                       (
+
                            post.destination, post.message_id, post.source_channel_id, post.source_message_id,
                            post.backup_id,
-                           post.reply_id, post.message_text, post.file_id))
+                           post.reply_id, post.message_text, post.file_id)
 
 
 @db
 async def get_post(source_channel_id: int, source_message_id: int, conn: Connection) -> Post:
     record: Record = await conn.fetchrow("select * from posts where source_channel_id =  $1 and source_message_id =  $2;",
-                                  (source_channel_id, source_message_id))
+                                  source_channel_id, source_message_id)
     return  record_to_dataclass(record, Post)
 
 
 @db
 async def set_destination(destination: Destination, conn: Connection):
     await conn.execute("INSERT INTO destinations( channel_id, name, group_id  ) VALUES ( $1, $2, $3)",
-                       (destination.channel_id, destination.name, destination.group_id))
+                       destination.channel_id, destination.name, destination.group_id)
 
 
 @db
