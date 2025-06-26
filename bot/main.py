@@ -83,8 +83,10 @@ async def main():
     logging.info(f"Running LOGGING ...")
 
     apps = list()
+    accounts = await get_accounts()
+    logging.debug(f"Accounts: {accounts}")
 
-    for a in await get_accounts():
+    for a in accounts:
         print(f"Account {a.name} >>>>>")
         logging.info(f"Account {a.name} >>>>>")
 
