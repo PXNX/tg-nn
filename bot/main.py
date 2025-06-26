@@ -20,8 +20,8 @@ from translation import translate, debloat_text, format_text
 
 def add_logging():
     if CONTAINER:
-        log_filename: Final[str] = rf"../logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
-        os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+       # log_filename: Final[str] = rf"../logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
+     #   os.makedirs(os.path.dirname(log_filename), exist_ok=True)
         logging.basicConfig(
             format="%(asctime)s %(levelname)-5s %(funcName)-20s [%(filename)s:%(lineno)d]: %(message)s",
             encoding="utf-8",
@@ -30,7 +30,7 @@ def add_logging():
             datefmt='%Y-%m-%d %H:%M:%S',
             handlers=[
                 logging.StreamHandler(),
-                  logging.FileHandler(log_filename)
+               #   logging.FileHandler(log_filename)
             ],
             force=True,
         )
