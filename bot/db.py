@@ -82,16 +82,9 @@ async def get_patterns(channel_id: int, conn: Connection) -> List[str]:
 
 @db
 async def get_source(channel_id: int, conn: Connection) -> SourceDisplay:
-    s: Source = await conn.fetchrow("select * from sources where channel_id = $1;", channel_id)
+    record: Record = await conn.fetchrow("select * from sources where channel_id = $1;", channel_id)
 
-    sd = SourceDisplay(
-        display_name=s.display_name or s.channel_name,
-        bias=s.bias,
-        invite=s.invite,
-        username=s.username,
-        detail_id=s.detail_id,
-        destination=s.destination
-    )
+    sd= record_to_dataclass(record, SourceDisplay)
 
     logging.info(f"sd >>>>>>>>>> {sd}")
     return sd
@@ -99,19 +92,11 @@ async def get_source(channel_id: int, conn: Connection) -> SourceDisplay:
 
 @db
 async def get_sources(conn: Connection) -> dict[int, SourceDisplay]:
-    sources = await conn.fetch("select * from sources")
-    s: Source
+    records: List[Record] = await conn.fetch("select * from sources")
+
     return {
-        s.channel_id: SourceDisplay(
-            s.display_name or s.channel_name,
-            s.is_spread,
-            s.bias,
-            s.invite,
-            s.username,
-            s.detail_id,
-            s.destination,
-        )
-        for s in sources
+        r["channel_id"]: record_to_dataclass(r, SourceDisplay)
+        for r in records
     }
 
 
@@ -168,9 +153,9 @@ async def set_post(post: Post, conn: Connection):
 
 @db
 async def get_post(source_channel_id: int, source_message_id: int, conn: Connection) -> Post:
-    s: Post = await conn.fetchrow("select * from posts where source_channel_id =  $1 and source_message_id =  $2;",
+    record: Record = await conn.fetchrow("select * from posts where source_channel_id =  $1 and source_message_id =  $2;",
                                   (source_channel_id, source_message_id))
-    return s
+    return  record_to_dataclass(record, Post)
 
 
 @db
