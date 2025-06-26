@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime
 from typing import Final
@@ -5,6 +6,9 @@ from typing import Final
 from dotenv import load_dotenv
 
 load_dotenv()
+
+print(os.environ)
+logging.info(os.environ)
 
 CHANNEL_TEST = -1001391125365
 CHANNEL_BACKUP = -1001861018052
