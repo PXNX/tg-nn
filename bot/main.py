@@ -73,7 +73,10 @@ def list_dir_tree(start_path):
 
 
 async def main():
-    add_logging()
+    # add_logging()
+
+    print(f"Running PRINT ...")
+    logging.info(f"Running LOGGING ...")
 
     apps = list()
 
