@@ -13,8 +13,11 @@ from bot.config import DATABASE_URL
 from bot.model import Account, Source, SourceDisplay, Post, Destination
 
 
-def record_to_dataclass(record: Record, dataclass_type) -> Any:
+def record_to_dataclass(record: Record, dataclass_type: Any) -> Any:
     """Convert asyncpg Record to dataclass"""
+    if record is None:
+        return None
+
     field_names = [f.name for f in fields(dataclass_type)]
     values = {name: record[name] for name in field_names if name in record}
     return dataclass_type(**values)
@@ -84,7 +87,7 @@ async def get_patterns(channel_id: int, conn: Connection) -> List[str]:
 async def get_source(channel_id: int, conn: Connection) -> SourceDisplay:
     record: Record = await conn.fetchrow("select * from sources where channel_id = $1;", channel_id)
 
-    sd= record_to_dataclass(record, SourceDisplay)
+    sd = record_to_dataclass(record, SourceDisplay)
 
     logging.info(f"sd >>>>>>>>>> {sd}")
     return sd
@@ -146,16 +149,17 @@ async def set_post(post: Post, conn: Connection):
     await conn.execute("""INSERT INTO posts(destination,message_id,source_channel_id,source_message_id,backup_id, 
              reply_id,message_text,file_id) VALUES ($1, $2, $3,$4, $5, $6,$7, $8 );""",
 
-                           post.destination, post.message_id, post.source_channel_id, post.source_message_id,
-                           post.backup_id,
-                           post.reply_id, post.message_text, post.file_id)
+                       post.destination, post.message_id, post.source_channel_id, post.source_message_id,
+                       post.backup_id,
+                       post.reply_id, post.message_text, post.file_id)
 
 
 @db
 async def get_post(source_channel_id: int, source_message_id: int, conn: Connection) -> Post:
-    record: Record = await conn.fetchrow("select * from posts where source_channel_id =  $1 and source_message_id =  $2;",
-                                  source_channel_id, source_message_id)
-    return  record_to_dataclass(record, Post)
+    record: Record = await conn.fetchrow(
+        "select * from posts where source_channel_id =  $1 and source_message_id =  $2;",
+        source_channel_id, source_message_id)
+    return record_to_dataclass(record, Post)
 
 
 @db
