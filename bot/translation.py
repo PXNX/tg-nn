@@ -75,7 +75,7 @@ def translate(text: str) -> str:
     return translated_text
 
 
-def format_text(text: str, message: Message, source: SourceDisplay, backup_id: int) -> str:
+async def format_text(text: str, message: Message, source: SourceDisplay, backup_id: int) -> str:
     formatted = f"{text}\n\nQuelle: <a href='{message.link}'>{source.display_name}"
     if source.bias is not None:
         formatted += f" {source.bias}"
@@ -88,7 +88,7 @@ def format_text(text: str, message: Message, source: SourceDisplay, backup_id: i
     if source.detail_id is not None:
         formatted += f"|<a href='https://t.me/nn_sources/{source.detail_id}'> ℹ️ </a>"
 
-    footer = get_footer(source.destination)
+    footer = await get_footer(source.destination)
     if footer is not None:
         formatted += footer
 

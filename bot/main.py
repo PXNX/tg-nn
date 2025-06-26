@@ -20,8 +20,8 @@ from translation import translate, debloat_text, format_text
 
 def add_logging():
     if CONTAINER:
-       # log_filename: Final[str] = rf"../logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
-     #   os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+        # log_filename: Final[str] = rf"../logs/{datetime.now().strftime('%Y-%m-%d/%H-%M-%S')}.log"
+        #   os.makedirs(os.path.dirname(log_filename), exist_ok=True)
         logging.basicConfig(
             format="%(asctime)s %(levelname)-5s %(funcName)-20s [%(filename)s:%(lineno)d]: %(message)s",
             encoding="utf-8",
@@ -30,7 +30,7 @@ def add_logging():
             datefmt='%Y-%m-%d %H:%M:%S',
             handlers=[
                 logging.StreamHandler(),
-               #   logging.FileHandler(log_filename)
+                #   logging.FileHandler(log_filename)
             ],
             force=True,
         )
@@ -125,12 +125,12 @@ async def main():
                     medias.append(InputMediaVideo(v))
                 for v in cp.image_urls:
                     medias.append(InputMediaPhoto(v))
-                medias[0].caption = format_text(translate(cp.caption), message, source, backup_id)
+                medias[0].caption = await format_text(translate(cp.caption), message, source, backup_id)
 
                 msg = (await client.send_media_group(CHANNEL_UA, medias))[0]
 
                 for text in cp.texts:
-                    text = format_text(translate(text), message, source, backup_id)
+                    text = await  format_text(translate(text), message, source, backup_id)
                     msg = await client.send_message(CHANNEL_UA, text, reply_to_message_id=msg.id,
                                                     disable_web_page_preview=True)
 
@@ -153,7 +153,7 @@ async def main():
 
                 msg = await client.send_photo(source.destination,
                                               cp.image_urls[0],
-                                              format_text(cp.caption, message, source, backup_id)
+                                              await     format_text(cp.caption, message, source, backup_id)
                                               )
 
         bf = filters.channel & filters.chat(sources) & ~filters.forwarded & filters.incoming
@@ -172,7 +172,7 @@ async def main():
             logging.info(f"T X -single {text}", )
 
             backup_id = await backup_single(client, message)
-            text = format_text(text, message, source, backup_id)
+            text = await format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
                 reply_post = await get_post(message.chat.id, message.reply_to_message_id)
@@ -219,7 +219,7 @@ async def main():
 
             logging.info(f"edit text::: {post}", )
 
-            text = format_text(text, message, source, post.backup_id)
+            text = await format_text(text, message, source, post.backup_id)
             try:
                 await client.edit_message_text(post.destination, post.message_id, text, disable_web_page_preview=True)
             except MessageNotModified:
@@ -240,7 +240,7 @@ async def main():
             if not source.is_spread:
                 return
 
-            text = format_text(text, message, source, backup_id)
+            text = await format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
                 reply_post = await get_post(message.chat.id, message.reply_to_message_id)
@@ -281,7 +281,7 @@ async def main():
                 return
 
             logging.info(f">>>>>> {client.name}: handle_single {source, message.chat.id, backup_id}")
-            text = format_text(text, message, source, backup_id)
+            text = await format_text(text, message, source, backup_id)
 
             if message.reply_to_message_id is not None:
                 reply_post = await  get_post(message.chat.id, message.reply_to_message_id)
@@ -331,7 +331,7 @@ async def main():
             if not text:
                 return
 
-            text = format_text(text, message, source, post.backup_id)
+            text = await format_text(text, message, source, post.backup_id)
 
             try:
                 logging.info(f"edit_caption ::::::::::::::::::::: {post}", )
