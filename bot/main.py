@@ -84,7 +84,7 @@ async def main():
 
     apps = list()
     accounts = await get_accounts()
-    logging.debug(f"Accounts: {accounts}")
+    logging.info(f"Accounts: {accounts}")
 
     for a in accounts:
         print(f"Account {a.name} >>>>>")
