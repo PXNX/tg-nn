@@ -29,7 +29,8 @@ def add_logging():
             handlers=[
                 logging.StreamHandler(),
                   logging.FileHandler('logs/log')
-            ]
+            ],
+            force=True,
         )
 
     else:
@@ -41,6 +42,7 @@ def add_logging():
             filename=log_filename,
             level=logging.INFO,
             datefmt='%Y-%m-%d %H:%M:%S',
+            force=True,
         )
 
     logging.getLogger("httpx").setLevel(logging.WARNING)
